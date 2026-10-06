@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bahan Pangan - Dapur Cerdas</title>
+    <link rel="stylesheet" href="/static/css/bahan_pangan.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <img src="/static/img/logo_dapur_cerdas.png" alt="Logo Dapur Cerdas">
+            <div>
+                <h1>Bahan Pangan</h1>
+                <p>Kelola data bahan pangan dan nilai gizinya</p>
+            </div>
+        </div>
+
+        <a href="/dashboard" class="back-button">← Dashboard</a>
+    </header>
+
+    <main class="container">
+
+        <section class="page-header">
+            <div>
+                <h2>Data Bahan Pangan</h2>
+                <p>Kelola informasi bahan pangan yang digunakan dalam sistem Dapur Cerdas.</p>
+                <p class="note">Semua nilai gizi dinyatakan per 100 gram bagian yang dapat dimakan.</p>
+            </div>
+
+            <a href="/bahan/tambah" class="add-button">
+                + Tambah Bahan
+            </a>
+        </section>
+
+        <section class="table-card">
+            <table>
+                <thead>
+                    <!-- Baris 1: kelompok kolom -->
+                    <tr>
+                        <th rowspan="2">No</th>
+                        <th rowspan="2">Nama Bahan</th>
+                        <th rowspan="2">Kategori</th>
+                        <th colspan="3" class="group group-takaran">Takaran</th>
+                        <th colspan="6" class="group group-makro">Makronutrien (per 100 g)</th>
+                        <th colspan="7" class="group group-mikro">Mineral &amp; Vitamin (per 100 g)</th>
+                        <th rowspan="2">Alergen</th>
+                        <th rowspan="2">Sumber Data</th>
+                        <th rowspan="2">Aksi</th>
+                    </tr>
+
+                    <!-- Baris 2: kolom detail -->
+                    <tr>
+                        <!-- Takaran -->
+                        <th>Satuan</th>
+                        <th>Berat/Satuan<small>(g)</small></th>
+                        <th>BDD<small>(%)</small></th>
+
+                        <!-- Makronutrien -->
+                        <th>Kalori<small>(kkal)</small></th>
+                        <th>Protein<small>(g)</small></th>
+                        <th>Lemak<small>(g)</small></th>
+                        <th>Karbohidrat<small>(g)</small></th>
+                        <th>Serat<small>(g)</small></th>
+                        <th>Gula<small>(g)</small></th>
+
+                        <!-- Mineral & vitamin -->
+                        <th>Natrium<small>(mg)</small></th>
+                        <th>Kolesterol<small>(mg)</small></th>
+                        <th>Kalsium<small>(mg)</small></th>
+                        <th>Zat Besi<small>(mg)</small></th>
+                        <th>Kalium<small>(mg)</small></th>
+                        <th>Vitamin A<small>(mcg)</small></th>
+                        <th>Vitamin C<small>(mg)</small></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {{range $i, $b := .DaftarBahan}}
+                    <tr>
+                        <td>{{inc $i}}</td>
+                        <td>{{$b.NamaBahan}}</td>
+                        <td>{{$b.Kategori}}</td>
+                        <td>{{$b.Satuan}}</td>
+                        <td>{{$b.BeratPerSatuan}}</td>
+                        <td>{{$b.BDD}}</td>
+                        <td>{{$b.Kalori}}</td>
+                        <td>{{$b.Protein}}</td>
+                        <td>{{$b.Lemak}}</td>
+                        <td>{{$b.Karbohidrat}}</td>
+                        <td>{{$b.Serat}}</td>
+                        <td>{{$b.Gula}}</td>
+                        <td>{{$b.Natrium}}</td>
+                        <td>{{$b.Kolesterol}}</td>
+                        <td>{{$b.Kalsium}}</td>
+                        <td>{{$b.ZatBesi}}</td>
+                        <td>{{$b.Kalium}}</td>
+                        <td>{{$b.VitaminA}}</td>
+                        <td>{{$b.VitaminC}}</td>
+                        <td>
+                            {{range $b.Alergen}}<span class="badge">{{.}}</span>{{end}}
+                        </td>
+                        <td>{{$b.SumberData}}</td>
+                        <td>
+                            <a href="/bahan/{{$b.ID}}/edit" class="btn-edit">Edit</a>
+                            <form action="/bahan/{{$b.ID}}/hapus" method="POST" class="form-hapus"
+                                onsubmit="return confirm('Yakin ingin menghapus bahan ini?')">
+                                <button type="submit" class="btn-hapus">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="22" class="empty">
+                            Belum ada data bahan pangan.
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+</body>
+</html>

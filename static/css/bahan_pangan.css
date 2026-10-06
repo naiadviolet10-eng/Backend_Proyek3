@@ -1,0 +1,239 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f6f8f7;
+    color: #26352d;
+}
+
+.header {
+    background: white;
+    padding: 20px 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e4e9e6;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-left img {
+    width: 55px;
+    height: 55px;
+    object-fit: contain;
+}
+
+.header-left h1 {
+    font-size: 22px;
+    color: #315d42;
+}
+
+.header-left p {
+    margin-top: 5px;
+    font-size: 13px;
+    color: #7b8881;
+}
+
+.back-button {
+    text-decoration: none;
+    color: #315d42;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 35px auto;
+    padding: 0 40px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.page-header h2 {
+    font-size: 24px;
+    color: #26352d;
+}
+
+.page-header p {
+    margin-top: 7px;
+    color: #7b8881;
+    font-size: 14px;
+}
+
+.add-button {
+    background: #3d7a55;
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.add-button:hover {
+    background: #326746;
+}
+
+.table-card {
+    background: white;
+    border-radius: 14px;
+    overflow-x: auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 950px;
+}
+
+thead {
+    background: #eef5f0;
+}
+
+th {
+    padding: 15px;
+    text-align: left;
+    font-size: 13px;
+    color: #315d42;
+    white-space: nowrap;
+}
+
+td {
+    padding: 16px 15px;
+    border-top: 1px solid #edf0ee;
+    font-size: 13px;
+}
+
+.empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #8a968f;
+}
+
+@media (max-width: 700px) {
+    .header {
+        padding: 18px 20px;
+    }
+
+    .container {
+        padding: 0 20px;
+    }
+
+    .page-header {
+        align-items: flex-start;
+        gap: 20px;
+        flex-direction: column;
+    }
+}
+
+/* ===== Tambahan untuk tabel bahan pangan (kolom banyak) ===== */
+
+/* Lebar tabel diperlebar karena ada 22 kolom (menimpa min-width: 950px) */
+.table-card table {
+    min-width: 1800px;
+}
+
+td {
+    white-space: nowrap;
+}
+
+/* Catatan kecil di header halaman */
+.page-header .note {
+    font-size: 12px;
+    color: #9aa6a0;
+}
+
+/* Header bertingkat: judul kelompok kolom */
+th small {
+    display: block;
+    margin-top: 2px;
+    font-weight: normal;
+    font-size: 11px;
+    color: #7b8881;
+}
+
+th.group {
+    text-align: center;
+    border-left: 1px solid #dbe6df;
+    border-right: 1px solid #dbe6df;
+}
+
+.group-takaran { background: #e4eee8; }
+.group-makro   { background: #dcebe1; }
+.group-mikro   { background: #d3e6da; }
+
+/* Kolom angka rata tengah (Berat/Satuan sampai Vitamin C) */
+thead tr:nth-child(2) th,
+tbody td:nth-child(n+5):nth-child(-n+19) {
+    text-align: center;
+}
+
+/* Kolom Nama Bahan tetap terlihat saat tabel digeser */
+thead tr:first-child th:nth-child(2),
+tbody td:nth-child(2) {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: white;
+    font-weight: 600;
+}
+
+thead tr:first-child th:nth-child(2) {
+    background: #eef5f0;
+}
+
+/* Tag alergen */
+.badge {
+    display: inline-block;
+    padding: 3px 9px;
+    margin: 2px 2px 2px 0;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #fdf1d6;
+    color: #8a6414;
+}
+
+/* Tombol aksi */
+.btn-edit,
+.btn-hapus {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.btn-edit {
+    background: #e4eee8;
+    color: #315d42;
+}
+
+.btn-edit:hover {
+    background: #d3e6da;
+}
+
+.btn-hapus {
+    background: #fbe4e4;
+    color: #a63c3c;
+    margin-left: 4px;
+}
+
+.btn-hapus:hover {
+    background: #f6d0d0;
+}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Dapur Cerdas</title>
+    <link rel="stylesheet" href="/static/css/menu.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <img src="/static/img/logo_dapur_cerdas.png" alt="Logo Dapur Cerdas">
+
+            <div>
+                <h1>Menu</h1>
+                <p>Kelola menu makanan berdasarkan kebutuhan pengguna</p>
+            </div>
+        </div>
+
+        <a href="/dashboard" class="back-button">
+            ← Dashboard
+        </a>
+    </header>
+
+    <main class="container">
+
+        <section class="page-header">
+            <div>
+                <h2>Kelola Menu</h2>
+                <p>
+                    Atur menu berdasarkan kelompok usia dan kebutuhan
+                    gizi pada periode 1000 HPK.
+                </p>
+            </div>
+
+            <a href="/menu/tambah" class="add-button">
+                + Tambah Menu
+            </a>
+        </section>
+
+        <section class="menu-category">
+
+            <div class="category-card age-card">
+                <div class="category-icon">
+                    👶
+                </div>
+
+                <div class="category-content">
+                    <span>Menu Berdasarkan Usia</span>
+                    <h3>Kelompok Usia</h3>
+                    <p>
+                        Kelola menu sesuai dengan kebutuhan makanan
+                        berdasarkan kelompok usia.
+                    </p>
+
+                    <a href="#" class="category-button">
+                        Kelola Menu →
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-card hpk-card">
+                <div class="category-icon">
+                    🌱
+                </div>
+
+                <div class="category-content">
+                    <span>Menu Khusus</span>
+                    <h3>1000 HPK</h3>
+                    <p>
+                        Kelola menu untuk mendukung kebutuhan gizi
+                        pada periode 1000 Hari Pertama Kehidupan.
+                    </p>
+
+                    <a href="#" class="category-button">
+                        Kelola Menu →
+                    </a>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="filter-section">
+
+            <div class="search-box">
+                <input
+                    type="text"
+                    placeholder="Cari nama menu..."
+                >
+            </div>
+
+            <select>
+                <option value="">Semua Kelompok Usia</option>
+                <option value="bayi">Bayi</option>
+                <option value="balita">Balita</option>
+                <option value="anak">Anak</option>
+                <option value="remaja">Remaja</option>
+            </select>
+
+            <select>
+                <option value="">Semua Jenis Menu</option>
+                <option value="usia">Berdasarkan Usia</option>
+                <option value="hpk">1000 HPK</option>
+            </select>
+
+        </section>
+
+        <section class="table-card">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Menu</th>
+                        <th>Kelompok Usia</th>
+                        <th>Jenis Menu</th>
+                        <th>Standar Gizi</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td colspan="7" class="empty">
+
+                            <div class="empty-icon">
+                                🍽️
+                            </div>
+
+                            <strong>Belum ada data menu</strong>
+
+                            <p>
+                                Menu yang ditambahkan akan muncul
+                                di halaman ini.
+                            </p>
+
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+    <footer>
+        © 2026 Dapur Cerdas — Copyright
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dapur Cerdas</title>
+
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="login-card">
+
+            <!-- Logo -->
+            <img
+                src="/static/img/logo_dapur_cerdas.png"
+                alt="Logo Dapur Cerdas"
+                class="logo"
+            >
+
+            <!-- Form Login -->
+            <form action="/login" method="POST">
+
+                {{if .Error}}
+                <p class="error-message">{{.Error}}</p>
+                {{end}}
+
+                <div class="form-group">
+                    <label for="email">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="email"
+                        name="email"
+                        placeholder="Masukkan username"
+                        value="{{.Email}}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Masukkan password"
+                        required
+                    >
+                </div>
+
+                <button type="submit">
+                    Login
+                </button>
+
+            </form>
+
+            <p class="footer-text">
+                © 2026 Dapur Cerdas
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

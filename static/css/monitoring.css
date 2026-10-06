@@ -1,0 +1,531 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #333;
+}
+
+/* Main Content */
+.main-content {
+    width: 100%;
+    padding: 25px 30px;
+}
+
+/* Header */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.page-title h1 {
+    font-size: 25px;
+    margin-bottom: 5px;
+}
+
+.page-title p {
+    color: #777;
+    font-size: 13px;
+}
+
+.admin-info {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.admin-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #e8f5e9;
+    color: #2e7d32;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.admin-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.admin-text strong {
+    font-size: 14px;
+}
+
+.admin-text small {
+    font-size: 11px;
+    color: #777;
+}
+
+/* Section */
+.section {
+    margin-bottom: 22px;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 13px;
+}
+
+.section-title h2 {
+    font-size: 17px;
+    margin-bottom: 4px;
+}
+
+.section-title p {
+    font-size: 12px;
+    color: #777;
+}
+
+/* Statistik */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.stat-card {
+    background: #fff;
+    padding: 17px;
+    border-radius: 10px;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .05);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.stat-icon {
+    font-size: 23px;
+}
+
+.stat-content span {
+    display: block;
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 4px;
+}
+
+.stat-content h3 {
+    font-size: 22px;
+    color: #2e7d32;
+}
+
+/* Search */
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.search-box input {
+    width: 210px;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+    font-size: 12px;
+}
+
+.search-box button {
+    border: none;
+    background: #2e7d32;
+    color: #fff;
+    padding: 8px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Table */
+.table-container {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .05);
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 11px 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+th {
+    background: #f8f9fa;
+    color: #555;
+    font-size: 12px;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover {
+    background: #fafafa;
+}
+
+/* User */
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e8f5e9;
+    color: #2e7d32;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-info strong {
+    font-size: 13px;
+}
+
+.user-info small {
+    font-size: 11px;
+    color: #777;
+}
+
+/* Status */
+.status {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 14px;
+    font-size: 11px;
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* Detail Button */
+.detail-btn {
+    border: none;
+    background: #2e7d32;
+    color: #fff;
+    padding: 7px 11px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.detail-btn:hover {
+    background: #256628;
+}
+
+/* Bottom Cards */
+.bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.monitor-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 17px;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .05);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 13px;
+}
+
+.card-header h2 {
+    font-size: 16px;
+    margin-bottom: 3px;
+}
+
+.card-header p {
+    font-size: 11px;
+    color: #777;
+}
+
+.card-icon {
+    font-size: 23px;
+}
+
+/* Food Waste */
+.waste-data {
+    margin-bottom: 12px;
+}
+
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 12px;
+}
+
+.data-row:last-child {
+    border-bottom: none;
+}
+
+.data-row strong {
+    color: #2e7d32;
+}
+
+/* Progress */
+.progress-container {
+    margin-top: 6px;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.progress-label strong {
+    color: #2e7d32;
+}
+
+.progress {
+    width: 100%;
+    height: 8px;
+    background: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 70%;
+    background: #4caf50;
+    border-radius: 10px;
+}
+
+/* Penghematan */
+.saving-value {
+    background: #f8f9fa;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 11px;
+}
+
+.saving-value span {
+    display: block;
+    font-size: 11px;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.saving-value h3 {
+    font-size: 22px;
+    color: #2e7d32;
+}
+
+.saving-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.saving-info > div {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 7px;
+}
+
+.saving-info span {
+    display: block;
+    font-size: 11px;
+    color: #777;
+    margin-bottom: 4px;
+}
+
+.saving-info strong {
+    font-size: 13px;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    background: rgba(0, 0, 0, .45);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 480px;
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    right: 14px;
+    top: 10px;
+    border: none;
+    background: none;
+    font-size: 24px;
+    color: #777;
+    cursor: pointer;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.modal-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e8f5e9;
+    color: #2e7d32;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.modal-header h2 {
+    font-size: 17px;
+    margin-bottom: 2px;
+}
+
+.modal-header p {
+    font-size: 11px;
+    color: #777;
+}
+
+/* Nutrition */
+.nutrition-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.nutrition-card {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 7px;
+}
+
+.nutrition-card span {
+    display: block;
+    font-size: 11px;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.nutrition-card strong {
+    font-size: 16px;
+    color: #2e7d32;
+}
+
+/* Analysis */
+.analysis-box,
+.recommendation-box {
+    margin-top: 11px;
+    padding: 12px;
+    border-radius: 7px;
+    background: #f8f9fa;
+}
+
+.analysis-box h3,
+.recommendation-box h3 {
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.analysis-box p,
+.recommendation-box p {
+    font-size: 11px;
+    line-height: 1.5;
+    color: #666;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+    .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .bottom-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .main-content {
+        padding: 18px;
+    }
+
+    .topbar {
+        align-items: flex-start;
+    }
+
+    .admin-info {
+        display: none;
+    }
+
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-title {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .search-box input {
+        width: 100%;
+    }
+
+    .bottom-grid {
+        grid-template-columns: 1fr;
+    }
+}

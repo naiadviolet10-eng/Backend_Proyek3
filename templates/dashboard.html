@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Dapur Cerdas</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="brand">
+            <img src="/static/img/logo_dapur_cerdas.png" alt="Logo Dapur Cerdas">
+            <div>
+                <h2>Dapur Cerdas</h2>
+            </div>
+        </div>
+
+        <div class="admin-profile">
+            <div class="notification">
+                🔔
+            </div>
+
+            <div class="avatar">
+                A
+            </div>
+
+            <span>Admin</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="container">
+
+        <!-- WELCOME -->
+        <section class="welcome">
+            <div>
+                <p class="small-title">DASHBOARD</p>
+
+                <h1>
+                    Hallo
+                    <span>Admin!</span>
+                </h1>
+
+                <p class="description">
+                    Kelola Data Bahan Pangan, Resep, Menu & Informasi
+                    Gizi Dapur Cerdas Dengan Mudah.
+                </p>
+            </div>
+
+            <div class="date-box">
+                <span>Hari ini</span>
+                <strong>{{.Tanggal}}</strong>
+                <small id="waktu">{{.Waktu}} WIB</small>
+            </div>
+        </section>
+
+        <!-- QUICK ACTION -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Apa yang ingin kamu kelola?</h2>
+
+                <p>
+                    Akses cepat ke pengelolaan data Dapur Cerdas.
+                </p>
+            </div>
+
+            <div class="action-grid">
+
+                <!-- BAHAN PANGAN -->
+                <a href="/bahan-pangan" class="action-card green">
+                    <div class="icon">
+                        🌿
+                    </div>
+
+                    <div class="action-content">
+                        <h3>Bahan Pangan</h3>
+
+                        <p>
+                            Kelola data bahan pangan dan informasi gizi.
+                        </p>
+
+                        <span class="action-link">
+                            Kelola Bahan Pangan
+                        </span>
+                    </div>
+                </a>
+
+                <!-- RESEP -->
+                <a href="/resep" class="action-card yellow">
+                    <div class="icon">
+                        🍲
+                    </div>
+
+                    <div class="action-content">
+                        <h3>Resep</h3>
+
+                        <p>
+                            Kelola resep dan moderasi resep AI.
+                        </p>
+
+                        <span class="action-link">
+                            Kelola Resep
+                        </span>
+                    </div>
+                </a>
+
+                <!-- MENU -->
+                <a href="/menu" class="action-card orange">
+                    <div class="icon">
+                        🍽️
+                    </div>
+
+                    <div class="action-content">
+                        <h3>Menu</h3>
+
+                        <p>
+                            Kelola Menu berdasarkan usia dan 1000 HPK.
+                        </p>
+
+                        <span class="action-link">
+                            Kelola Menu
+                        </span>
+                    </div>
+                </a>
+
+                <!-- MONITORING -->
+                <a href="/monitoring" class="action-card blue">
+                    <div class="icon">
+                        📊
+                    </div>
+
+                    <div class="action-content">
+                        <h3>Monitoring</h3>
+
+                        <p>
+                            Pantau statistik dan perkembangan sistem.
+                        </p>
+
+                        <span class="action-link">
+                            Kelola Monitoring
+                        </span>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- DATA SUMMARY -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Ringkasan Data</h2>
+
+                <p>
+                    Kondisi data yang tersimpan dalam sistem.
+                </p>
+            </div>
+
+            <div class="summary-grid">
+
+                <div class="summary-card">
+                    <div class="summary-icon green-icon">
+                        🌿
+                    </div>
+
+                    <div>
+                        <span>Total Bahan</span>
+                        <strong>120</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon yellow-icon">
+                        🍲
+                    </div>
+
+                    <div>
+                        <span>Total Resep</span>
+                        <strong>85</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon orange-icon">
+                        🍽️
+                    </div>
+
+                    <div>
+                        <span>Total Menu</span>
+                        <strong>32</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card warning">
+                    <div class="summary-icon red-icon">
+                        ⚠️
+                    </div>
+
+                    <div>
+                        <span>Perlu Moderasi</span>
+                        <strong>8</strong>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- BOTTOM CONTENT -->
+        <section class="bottom-grid">
+
+            <!-- AKTIVITAS -->
+            <div class="panel">
+
+                <div class="panel-header">
+                    <div>
+                        <h2>Aktivitas Terbaru</h2>
+
+                        <p>
+                            Aktivitas yang terjadi di sistem.
+                        </p>
+                    </div>
+
+                    <span class="panel-icon">
+                        🕐
+                    </span>
+                </div>
+
+                <div class="activity-list">
+
+                    <div class="activity">
+                        <div class="activity-icon">
+                            🌿
+                        </div>
+
+                        <div>
+                            <strong>
+                                Bahan pangan ditambahkan
+                            </strong>
+
+                            <span>
+                                Admin menambahkan data "Bayam"
+                            </span>
+                        </div>
+
+                        <small>
+                            10 menit lalu
+                        </small>
+                    </div>
+
+                    <div class="activity">
+                        <div class="activity-icon">
+                            🍲
+                        </div>
+
+                        <div>
+                            <strong>
+                                Resep diperbarui
+                            </strong>
+
+                            <span>
+                                Resep "Nasi Ayam" telah diperbarui
+                            </span>
+                        </div>
+
+                        <small>
+                            30 menit lalu
+                        </small>
+                    </div>
+
+                    <div class="activity">
+                        <div class="activity-icon">
+                            📊
+                        </div>
+
+                        <div>
+                            <strong>
+                                Data gizi diperbarui
+                            </strong>
+
+                            <span>
+                                Informasi gizi "Telur Ayam"
+                            </span>
+                        </div>
+
+                        <small>
+                            1 jam lalu
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- MODERASI -->
+            <div class="panel moderation">
+
+                <div class="panel-header">
+                    <div>
+                        <h2>Perlu Perhatian</h2>
+
+                        <p>
+                            Data yang menunggu tindakan admin.
+                        </p>
+                    </div>
+
+                    <span class="panel-icon">
+                        ⚠️
+                    </span>
+                </div>
+
+                <div class="moderation-item">
+                    <div>
+                        <strong>
+                            Bahan Pangan
+                        </strong>
+
+                        <span>
+                            Menunggu validasi
+                        </span>
+                    </div>
+
+                    <b>5</b>
+                </div>
+
+                <div class="moderation-item">
+                    <div>
+                        <strong>
+                            Resep AI
+                        </strong>
+
+                        <span>
+                            Menunggu moderasi
+                        </span>
+                    </div>
+
+                    <b>3</b>
+                </div>
+
+                <button class="view-button">
+                    Lihat Semua →
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>
+            © 2026 Dapur Cerdas — Copyright
+        </p>
+    </footer>
+
+    <!-- REALTIME CLOCK -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+
+            const jam = String(now.getHours()).padStart(2, "0");
+            const menit = String(now.getMinutes()).padStart(2, "0");
+            const detik = String(now.getSeconds()).padStart(2, "0");
+
+            document.getElementById("waktu").textContent =
+                jam + ":" + menit + ":" + detik + " WIB";
+        }
+
+        updateClock();
+
+        setInterval(updateClock, 1000);
+    </script>
+
+</body>
+</html>
