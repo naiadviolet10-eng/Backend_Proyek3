@@ -107,3 +107,32 @@ func requireLogin(next http.HandlerFunc) http.HandlerFunc {
 		next(w, r)
 	}
 }
+
+// Halaman profil: menampilkan user yang sedang login
+func profilPage(w http.ResponseWriter, r *http.Request) {
+	sess, _ := store.Get(r, "session")
+	username, _ := sess.Values["username"].(string)
+
+	inisial := "?"
+	if username != "" {
+		inisial = strings.ToUpper(username[:1])
+	}
+
+	tmpl, err := template.ParseFiles("templates/profil.html")
+	if err != nil {
+		http.Error(w, "Template profil error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		Username string
+		Inisial  string
+	}{
+		Username: username,
+		Inisial:  inisial,
+	}
+
+	if err := tmpl.Execute(w, data); err != nil {
+		http.Error(w, "Gagal menampilkan halaman profil: "+err.Error(), http.StatusInternalServerError)
+	}
+}

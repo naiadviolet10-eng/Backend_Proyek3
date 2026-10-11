@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Judul}} - Dapur Cerdas</title>
+    <link rel="stylesheet" href="/static/css/menu.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <img src="/static/img/logo_dapur_cerdas.png" alt="Logo Dapur Cerdas">
+            <div>
+                <h1>{{.Judul}}</h1>
+                <p>Pilih resep dan jumlah porsinya</p>
+            </div>
+        </div>
+        <a href="/menu" class="back-button">← Menu</a>
+    </header>
+
+    <main class="container narrow">
+        <form method="POST" action="{{.Action}}">
+
+            <section class="form-card">
+                <h3>Info Menu</h3>
+                <div class="form-grid">
+                    <div class="field span-2">
+                        <label for="nama">Nama Menu</label>
+                        <input type="text" id="nama" name="nama" value="{{.Menu.Nama}}" placeholder="Contoh: Menu Sehat Hari Senin" required>
+                    </div>
+                    <div class="field">
+                        <label for="tanggal">Tanggal (opsional)</label>
+                        <input type="date" id="tanggal" name="tanggal" value="{{.Menu.Tanggal}}">
+                    </div>
+                    <div class="field">
+                        <label for="waktu_makan">Waktu Makan</label>
+                        <select id="waktu_makan" name="waktu_makan">
+                            <option value="">Pilih waktu makan</option>
+                            {{range .DaftarWaktu}}
+                            <option value="{{.}}" {{if eq . $.Menu.WaktuMakan}}selected{{end}}>{{.}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div class="field span-2">
+                        <label for="deskripsi">Deskripsi (opsional)</label>
+                        <input type="text" id="deskripsi" name="deskripsi" value="{{.Menu.Deskripsi}}" placeholder="Keterangan singkat">
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-card">
+                <h3>Resep <span class="hint">jumlah porsi yang disajikan</span></h3>
+
+                {{if not .Opsi}}
+                <p class="peringatan">Belum ada resep. <a href="/resep/tambah">Tambah resep dulu</a> sebelum membuat menu.</p>
+                {{end}}
+
+                <div id="daftar-resep">
+                    {{range .Menu.Resep}}
+                    {{$rid := .ResepID}}
+                    <div class="baris-bahan">
+                        <select name="resep_id" required>
+                            <option value="">Pilih resep</option>
+                            {{range $.Opsi}}
+                            <option value="{{.ID}}" {{if eq .ID $rid}}selected{{end}}>{{.Label}}</option>
+                            {{end}}
+                        </select>
+                        <input type="number" name="jumlah_porsi" step="any" min="0" value="{{angka .Porsi}}" placeholder="Porsi" required>
+                        <button type="button" class="btn-hapus-baris" title="Hapus baris">✕</button>
+                    </div>
+                    {{end}}
+                </div>
+
+                <button type="button" id="tambah-baris" class="btn-tambah-baris">+ Tambah Resep</button>
+                <p class="hint-bawah">Resep yang dicari belum ada? <a href="/resep/tambah" target="_blank">Buat resep baru</a> (tab baru), lalu muat ulang halaman ini.</p>
+            </section>
+
+            <div class="form-actions">
+                <a href="/menu" class="btn-batal">Batal</a>
+                <button type="submit" class="btn-simpan">Simpan Menu</button>
+            </div>
+        </form>
+    </main>
+
+    <template id="tpl-baris">
+        <div class="baris-bahan">
+            <select name="resep_id" required>
+                <option value="">Pilih resep</option>
+                {{range .Opsi}}
+                <option value="{{.ID}}">{{.Label}}</option>
+                {{end}}
+            </select>
+            <input type="number" name="jumlah_porsi" step="any" min="0" value="1" placeholder="Porsi" required>
+            <button type="button" class="btn-hapus-baris" title="Hapus baris">✕</button>
+        </div>
+    </template>
+
+    <script>
+        const daftar = document.getElementById('daftar-resep');
+        const tpl = document.getElementById('tpl-baris');
+
+        function tambahBaris() {
+            daftar.appendChild(tpl.content.cloneNode(true));
+        }
+
+        document.getElementById('tambah-baris').addEventListener('click', tambahBaris);
+
+        daftar.addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn-hapus-baris')) {
+                e.target.closest('.baris-bahan').remove();
+            }
+        });
+
+        if (daftar.children.length === 0) {
+            tambahBaris();
+        }
+    </script>
+
+</body>
+</html>

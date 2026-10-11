@@ -18,16 +18,22 @@
         </div>
 
         <div class="admin-profile">
-            <div class="notification">
-                🔔
-            </div>
+    <div class="notification">🔔</div>
 
-            <div class="avatar">
-                A
-            </div>
-
+    <div class="profile-menu">
+        <button type="button" class="profile-trigger" id="profileTrigger"
+                aria-haspopup="true" aria-expanded="false">
+            <span class="avatar">A</span>
             <span>Admin</span>
+            <span class="caret">▾</span>
+        </button>
+
+        <div class="dropdown" id="profileDropdown">
+            <a href="/profil" class="dropdown-item">👤 Profil Saya</a>
+            <a href="/logout" class="dropdown-item logout">🚪 Logout</a>
         </div>
+    </div>
+</div>
     </header>
 
     <!-- MAIN CONTENT -->
@@ -83,25 +89,6 @@
 
                         <span class="action-link">
                             Kelola Bahan Pangan
-                        </span>
-                    </div>
-                </a>
-
-                <!-- RESEP -->
-                <a href="/resep" class="action-card yellow">
-                    <div class="icon">
-                        🍲
-                    </div>
-
-                    <div class="action-content">
-                        <h3>Resep</h3>
-
-                        <p>
-                            Kelola resep dan moderasi resep AI.
-                        </p>
-
-                        <span class="action-link">
-                            Kelola Resep
                         </span>
                     </div>
                 </a>
@@ -370,6 +357,29 @@
 
         setInterval(updateClock, 1000);
     </script>
+
+    <script>
+    const trigger = document.getElementById("profileTrigger");
+    const dropdown = document.getElementById("profileDropdown");
+
+    trigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        const terbuka = dropdown.classList.toggle("show");
+        trigger.setAttribute("aria-expanded", terbuka);
+    });
+
+    document.addEventListener("click", function () {
+        dropdown.classList.remove("show");
+        trigger.setAttribute("aria-expanded", "false");
+    });
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+            dropdown.classList.remove("show");
+            trigger.setAttribute("aria-expanded", "false");
+        }
+    });
+</script>
 
 </body>
 </html>

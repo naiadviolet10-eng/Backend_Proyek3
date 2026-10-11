@@ -3,148 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu - Dapur Cerdas</title>
+    <title>Menu & Resep - Dapur Cerdas</title>
     <link rel="stylesheet" href="/static/css/menu.css">
+    <link rel="stylesheet" href="/static/css/resep.css">
 </head>
 <body>
 
     <header class="header">
         <div class="header-left">
             <img src="/static/img/logo_dapur_cerdas.png" alt="Logo Dapur Cerdas">
-
             <div>
-                <h1>Menu</h1>
-                <p>Kelola menu makanan berdasarkan kebutuhan pengguna</p>
+                <h1>Menu & Resep</h1>
+                <p>Kelola menu makanan dan resep di dalamnya</p>
             </div>
         </div>
-
-        <a href="/dashboard" class="back-button">
-            ← Dashboard
-        </a>
+        <a href="/dashboard" class="back-button">← Dashboard</a>
     </header>
 
     <main class="container">
 
-        <section class="page-header">
-            <div>
-                <h2>Kelola Menu</h2>
-                <p>
-                    Atur menu berdasarkan kelompok usia dan kebutuhan
-                    gizi pada periode 1000 HPK.
-                </p>
-            </div>
-
-            <a href="/menu/tambah" class="add-button">
-                + Tambah Menu
-            </a>
-        </section>
-
+        <!-- ===== KATEGORI MENU ===== -->
         <section class="menu-category">
-
             <div class="category-card age-card">
-                <div class="category-icon">
-                    👶
-                </div>
-
+                <div class="category-icon">👶</div>
                 <div class="category-content">
                     <span>Menu Berdasarkan Usia</span>
                     <h3>Kelompok Usia</h3>
-                    <p>
-                        Kelola menu sesuai dengan kebutuhan makanan
-                        berdasarkan kelompok usia.
-                    </p>
-
-                    <a href="#" class="category-button">
-                        Kelola Menu →
-                    </a>
+                    <p>Kelola menu sesuai dengan kebutuhan makanan berdasarkan kelompok usia.</p>
+                    <a href="#" class="category-button">Kelola Menu →</a>
                 </div>
             </div>
 
             <div class="category-card hpk-card">
-                <div class="category-icon">
-                    🌱
-                </div>
-
+                <div class="category-icon">🌱</div>
                 <div class="category-content">
                     <span>Menu Khusus</span>
                     <h3>1000 HPK</h3>
-                    <p>
-                        Kelola menu untuk mendukung kebutuhan gizi
-                        pada periode 1000 Hari Pertama Kehidupan.
-                    </p>
-
-                    <a href="#" class="category-button">
-                        Kelola Menu →
-                    </a>
+                    <p>Kelola menu untuk mendukung kebutuhan gizi pada periode 1000 Hari Pertama Kehidupan.</p>
+                    <a href="#" class="category-button">Kelola Menu →</a>
                 </div>
             </div>
+        </section>
 
+        <!-- ===== DAFTAR MENU (RESEP ADA DI DALAMNYA) ===== -->
+        <section class="page-header">
+            <div>
+                <h2>Kelola Menu</h2>
+                <p>Setiap menu berisi resep. Gizi dan alergen menu dihitung otomatis dari resep di dalamnya.</p>
+            </div>
+            <a href="/menu/tambah" class="add-button">+ Tambah Menu</a>
         </section>
 
         <section class="filter-section">
-
             <div class="search-box">
-                <input
-                    type="text"
-                    placeholder="Cari nama menu..."
-                >
+                <input type="text" id="cari-menu" placeholder="Cari nama menu...">
+            </div>
+        </section>
+
+        <div id="daftar-menu">
+        {{range $m := .DaftarMenu}}
+        <section class="form-card menu-card" data-nama="{{$m.Nama}}">
+
+            <div class="menu-head">
+                <div>
+                    <h3 class="menu-judul"><a href="/menu/{{$m.ID}}">{{$m.Nama}}</a></h3>
+                    <p class="menu-info">
+                        {{if $m.WaktuMakan}}{{$m.WaktuMakan}}{{else}}Waktu makan belum diisi{{end}}
+                        {{if $m.Tanggal}} · {{$m.Tanggal}}{{end}}
+                        {{if $m.Deskripsi}} · {{$m.Deskripsi}}{{end}}
+                    </p>
+                </div>
+                <div class="menu-aksi">
+                    <a href="/menu/{{$m.ID}}" class="btn-detail">Detail</a>
+                    <a href="/menu/{{$m.ID}}/edit" class="btn-edit">Edit</a>
+                    <form action="/menu/{{$m.ID}}/hapus" method="POST" class="form-hapus"
+                          onsubmit="return confirm('Yakin ingin menghapus menu ini?')">
+                        <button type="submit" class="btn-hapus">Hapus</button>
+                    </form>
+                </div>
             </div>
 
-            <select>
-                <option value="">Semua Kelompok Usia</option>
-                <option value="bayi">Bayi</option>
-                <option value="balita">Balita</option>
-                <option value="anak">Anak</option>
-                <option value="remaja">Remaja</option>
-            </select>
+            {{if $m.Alergen}}
+            <div class="peringatan">
+                <strong>Alergen:</strong>
+                {{range $m.Alergen}}<span class="badge">{{.}}</span>{{end}}
+            </div>
+            {{end}}
 
-            <select>
-                <option value="">Semua Jenis Menu</option>
-                <option value="usia">Berdasarkan Usia</option>
-                <option value="hpk">1000 HPK</option>
-            </select>
+            <p class="label-kecil">Resep dalam menu ini</p>
+            <table class="tabel-kecil">
+                <thead>
+                    <tr>
+                        <th>Resep</th>
+                        <th>Porsi</th>
+                        <th>Kalori</th>
+                        <th>Protein</th>
+                        <th>Lemak</th>
+                        <th>Karbo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $m.Baris}}
+                    <tr>
+                        <td class="nama">{{if .ID}}<a href="/resep/{{.ID}}">{{.Nama}}</a>{{else}}{{.Nama}}{{end}}</td>
+                        <td>{{f1 .Porsi}}</td>
+                        <td>{{f1 .Gizi.Kalori}}</td>
+                        <td>{{f1 .Gizi.Protein}}</td>
+                        <td>{{f1 .Gizi.Lemak}}</td>
+                        <td>{{f1 .Gizi.Karbohidrat}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2"><strong>Total menu</strong></td>
+                        <td><strong>{{f1 $m.Total.Kalori}}</strong></td>
+                        <td><strong>{{f1 $m.Total.Protein}}</strong></td>
+                        <td><strong>{{f1 $m.Total.Lemak}}</strong></td>
+                        <td><strong>{{f1 $m.Total.Karbohidrat}}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
 
+        </section>
+        {{else}}
+        <section class="form-card">
+            <div class="empty">
+                <div class="empty-icon">🍽️</div>
+                <strong>Belum ada data menu</strong>
+                <p>Menu yang ditambahkan akan muncul di halaman ini.</p>
+            </div>
+        </section>
+        {{end}}
+        </div>
+
+        <!-- ===== SEMUA RESEP ===== -->
+        <section class="page-header" style="margin-top:40px">
+            <div>
+                <h2>Semua Resep</h2>
+                <p>Resep yang bisa dipakai di menu. Nilai gizi dihitung dari bahan dan ditampilkan per porsi.</p>
+            </div>
+            <a href="/resep/tambah" class="add-button">+ Tambah Resep</a>
         </section>
 
         <section class="table-card">
-
             <table>
-
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Nama Menu</th>
-                        <th>Kelompok Usia</th>
-                        <th>Jenis Menu</th>
-                        <th>Standar Gizi</th>
-                        <th>Status</th>
+                        <th>Nama Resep</th>
+                        <th>Porsi</th>
+                        <th>Bahan</th>
+                        <th>Kalori<small>(kkal/porsi)</small></th>
+                        <th>Protein<small>(g/porsi)</small></th>
+                        <th>Lemak<small>(g/porsi)</small></th>
+                        <th>Karbohidrat<small>(g/porsi)</small></th>
+                        <th>Alergen</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
+                    {{range $i, $r := .DaftarResep}}
                     <tr>
-                        <td colspan="7" class="empty">
-
-                            <div class="empty-icon">
-                                🍽️
-                            </div>
-
-                            <strong>Belum ada data menu</strong>
-
-                            <p>
-                                Menu yang ditambahkan akan muncul
-                                di halaman ini.
-                            </p>
-
+                        <td>{{inc $i}}</td>
+                        <td class="nama"><a href="/resep/{{$r.ID}}">{{$r.Nama}}</a></td>
+                        <td>{{$r.Porsi}}</td>
+                        <td>{{len $r.Baris}} bahan</td>
+                        <td>{{f1 $r.PerPorsi.Kalori}}</td>
+                        <td>{{f1 $r.PerPorsi.Protein}}</td>
+                        <td>{{f1 $r.PerPorsi.Lemak}}</td>
+                        <td>{{f1 $r.PerPorsi.Karbohidrat}}</td>
+                        <td>{{range $r.Alergen}}<span class="badge">{{.}}</span>{{else}}-{{end}}</td>
+                        <td>
+                            <a href="/resep/{{$r.ID}}" class="btn-detail">Detail</a>
+                            <a href="/resep/{{$r.ID}}/edit" class="btn-edit">Edit</a>
+                            <form action="/resep/{{$r.ID}}/hapus" method="POST" class="form-hapus"
+                                  onsubmit="return confirm('Yakin ingin menghapus resep ini?')">
+                                <button type="submit" class="btn-hapus">Hapus</button>
+                            </form>
                         </td>
                     </tr>
-
+                    {{else}}
+                    <tr>
+                        <td colspan="10" class="empty">Belum ada resep.</td>
+                    </tr>
+                    {{end}}
                 </tbody>
-
             </table>
-
         </section>
 
     </main>
@@ -152,6 +197,16 @@
     <footer>
         © 2026 Dapur Cerdas — Copyright
     </footer>
+
+    <script>
+        // Pencarian nama menu (di sisi browser)
+        document.getElementById('cari-menu').addEventListener('input', function () {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('#daftar-menu .menu-card').forEach(function (k) {
+                k.style.display = k.dataset.nama.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    </script>
 
 </body>
 </html>
