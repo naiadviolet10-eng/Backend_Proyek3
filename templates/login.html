@@ -5,73 +5,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Dapur Cerdas</title>
+    <title>Login - Dapur Cerdas</title>
 
-    <link rel="stylesheet" href="/static/css/login.css">
+    <link rel="stylesheet" href="/static/css/login.css?v=2">
 </head>
 
 <body>
 
-    <div class="login-container">
+    <main class="login-wrapper">
 
-        <div class="login-card">
+        <!-- Panel kiri: pengenalan -->
+        <section class="login-info">
+            <div class="info-content">
+                <span class="info-tag">Sistem Pengelolaan Gizi</span>
+                <h1>Dapur Cerdas</h1>
+                <p>
+                    Kelola bahan pangan, susun resep, dan rancang menu
+                    dengan perhitungan gizi yang otomatis dan akurat.
+                </p>
 
-            <!-- Logo -->
-            <img
-                src="/static/img/logo_dapur_cerdas.png"
-                alt="Logo Dapur Cerdas"
-                class="logo"
-            >
+                <ul class="info-list">
+                    <li><span>🥬</span> Data bahan pangan dan nilai gizinya</li>
+                    <li><span>🍳</span> Resep dengan gizi per porsi</li>
+                    <li><span>🍽️</span> Menu lengkap dengan total gizi</li>
+                </ul>
+            </div>
 
-            <!-- Form Login -->
-            <form action="/login" method="POST">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+        </section>
 
-                {{if .Error}}
-                <p class="error-message">{{.Error}}</p>
-                {{end}}
+        <!-- Panel kanan: form login -->
+        <section class="login-form-area">
+            <div class="login-card">
 
-                <div class="form-group">
-                    <label for="email">
-                        Username
-                    </label>
+                <img
+                    src="/static/img/logo_dapur_cerdas.png"
+                    alt="Logo Dapur Cerdas"
+                    class="logo"
+                >
 
-                    <input
-                        type="text"
-                        id="email"
-                        name="email"
-                        placeholder="Masukkan username"
-                        value="{{.Email}}"
-                        required
-                    >
-                </div>
+                <h2>Selamat Datang</h2>
+                <p class="subtitle">Masuk untuk mengelola Dapur Cerdas</p>
 
-                <div class="form-group">
-                    <label for="password">
-                        Password
-                    </label>
+                <form action="/login" method="POST">
 
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Masukkan password"
-                        required
-                    >
-                </div>
+                    {{if .Error}}
+                    <p class="error-message">{{.Error}}</p>
+                    {{end}}
 
-                <button type="submit">
-                    Login
-                </button>
+                    <div class="form-group">
+                        <label for="email">Username</label>
+                        <input
+                            type="text"
+                            id="email"
+                            name="email"
+                            placeholder="Masukkan username"
+                            value="{{.Email}}"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
 
-            </form>
+                    <div class="form-group">
+                        <label for="password">Password</label>
 
-            <p class="footer-text">
-                © 2026 Dapur Cerdas
-            </p>
+                        <div class="password-box">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Masukkan password"
+                                autocomplete="current-password"
+                                required
+                            >
 
-        </div>
+                            <button type="button" class="toggle-password" id="toggle-password"
+                                    aria-label="Lihat password" title="Lihat password">
+                                <!-- Mata terbuka -->
+                                <svg class="ikon-mata" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <!-- Mata dicoret -->
+                                <svg class="ikon-tutup" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94"/>
+                                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                                    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
 
-    </div>
+                    <!-- Tombol Login -->
+                    <button type="submit" class="btn-login">Login</button>
+
+                </form>
+
+                <p class="footer-text">© 2026 Dapur Cerdas</p>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const kolom = document.getElementById('password');
+        const tombol = document.getElementById('toggle-password');
+
+        tombol.addEventListener('click', function () {
+            const tampil = kolom.type === 'password';
+            kolom.type = tampil ? 'text' : 'password';
+            tombol.classList.toggle('aktif', tampil);
+            tombol.title = tampil ? 'Sembunyikan password' : 'Lihat password';
+        });
+    </script>
 
 </body>
 

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -35,9 +34,8 @@ type BarisResep struct {
 
 type MenuView struct {
 	Menu
-	Baris   []BarisResep
-	Total   Gizi
-	Alergen []string
+	Baris []BarisResep
+	Total Gizi
 }
 
 type FormMenu struct {
@@ -50,22 +48,22 @@ type FormMenu struct {
 
 var daftarWaktuMakan = []string{"Sarapan", "Makan Siang", "Makan Malam", "Selingan"}
 
+// Menambahkan gizi b (dikali k) ke gizi a
 func tambahGizi(a, b Gizi, k float64) Gizi {
 	a.Kalori += b.Kalori * k
 	a.Protein += b.Protein * k
 	a.Lemak += b.Lemak * k
 	a.Karbohidrat += b.Karbohidrat * k
-	a.Serat += b.Serat * k
-	a.Gula += b.Gula * k
-	a.Natrium += b.Natrium * k
-	a.Kolesterol += b.Kolesterol * k
+	a.ZatBesi += b.ZatBesi * k
+	a.Seng += b.Seng * k
+	a.VitaminA += b.VitaminA * k
+	a.VitaminC += b.VitaminC * k
 	return a
 }
 
-// Menghitung gizi dan alergen menu dari resep-resepnya
+// Menghitung gizi menu dari resep-resepnya
 func hitungMenu(m Menu, resep map[int]ResepView) MenuView {
 	v := MenuView{Menu: m}
-	set := map[string]bool{}
 
 	for _, rm := range m.Resep {
 		rv, ada := resep[rm.ResepID]
@@ -75,16 +73,9 @@ func hitungMenu(m Menu, resep map[int]ResepView) MenuView {
 		}
 		g := tambahGizi(Gizi{}, rv.PerPorsi, rm.Porsi)
 		v.Total = tambahGizi(v.Total, rv.PerPorsi, rm.Porsi)
-		for _, a := range rv.Alergen {
-			set[a] = true
-		}
 		v.Baris = append(v.Baris, BarisResep{ID: rv.ID, Nama: rv.Nama, Porsi: rm.Porsi, Gizi: g})
 	}
 
-	for a := range set {
-		v.Alergen = append(v.Alergen, a)
-	}
-	sort.Strings(v.Alergen)
 	return v
 }
 

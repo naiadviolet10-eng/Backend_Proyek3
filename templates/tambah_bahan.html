@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Bahan - Dapur Cerdas</title>
+    <title>{{.Judul}} - Dapur Cerdas</title>
     <link rel="stylesheet" href="/static/css/tambah_bahan.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
         <div class="header-left">
             <img src="/static/img/logo_dapur_cerdas.png" alt="Logo Dapur Cerdas">
             <div>
-                <h1>Tambah Bahan</h1>
+                <h1>{{.Judul}}</h1>
                 <p>Isi data bahan pangan dan nilai gizinya</p>
             </div>
         </div>
@@ -21,7 +21,7 @@
     </header>
 
     <main class="container">
-        <form method="POST" action="/bahan/tambah">
+        <form method="POST" action="{{.Action}}">
 
             <!-- INFO DASAR -->
             <section class="form-card">
@@ -29,38 +29,26 @@
                 <div class="form-grid">
                     <div class="field span-2">
                         <label for="nama_bahan">Nama Bahan</label>
-                        <input type="text" id="nama_bahan" name="nama_bahan" placeholder="Contoh: Telur Ayam" required>
+                        <input type="text" id="nama_bahan" name="nama_bahan"
+                               value="{{.Bahan.NamaBahan}}"
+                               placeholder="Contoh: Telur Ayam" maxlength="100" required>
                     </div>
 
                     <div class="field">
-                        <label for="kategori">Kategori</label>
-                        <select id="kategori" name="kategori" required>
+                        <label for="kategori_id">Kategori</label>
+                        <select id="kategori_id" name="kategori_id" required>
                             <option value="">Pilih kategori</option>
-                            <option>Karbohidrat</option>
-                            <option>Protein Hewani</option>
-                            <option>Protein Nabati</option>
-                            <option>Sayuran</option>
-                            <option>Buah</option>
-                            <option>Susu &amp; Olahannya</option>
-                            <option>Lemak &amp; Minyak</option>
-                            <option>Bumbu</option>
-                            <option>Lainnya</option>
+                            {{range .DaftarKategori}}
+                            <option value="{{.ID}}" {{if eq .ID $.Bahan.KategoriID}}selected{{end}}>{{.Nama}}</option>
+                            {{end}}
                         </select>
                     </div>
 
                     <div class="field">
                         <label for="satuan">Satuan</label>
-                        <input type="text" id="satuan" name="satuan" placeholder="butir, sdm, potong">
-                    </div>
-
-                    <div class="field">
-                        <label for="berat_per_satuan">Berat per Satuan (g)</label>
-                        <input type="number" id="berat_per_satuan" name="berat_per_satuan" step="any" min="0" placeholder="Contoh: 55">
-                    </div>
-
-                    <div class="field">
-                        <label for="bdd">BDD (%)</label>
-                        <input type="number" id="bdd" name="bdd" step="any" min="0" max="100" value="100">
+                        <input type="text" id="satuan" name="satuan"
+                               value="{{.Bahan.Satuan}}"
+                               placeholder="butir, sdm, potong" maxlength="20" required>
                     </div>
                 </div>
             </section>
@@ -71,27 +59,23 @@
                 <div class="form-grid">
                     <div class="field">
                         <label for="kalori">Kalori (kkal)</label>
-                        <input type="number" id="kalori" name="kalori" step="any" min="0">
+                        <input type="number" id="kalori" name="kalori" step="any" min="0" max="9999.99"
+                               value="{{angka .Bahan.Kalori}}">
                     </div>
                     <div class="field">
                         <label for="protein">Protein (g)</label>
-                        <input type="number" id="protein" name="protein" step="any" min="0">
+                        <input type="number" id="protein" name="protein" step="any" min="0" max="9999.99"
+                               value="{{angka .Bahan.Protein}}">
                     </div>
                     <div class="field">
                         <label for="lemak">Lemak (g)</label>
-                        <input type="number" id="lemak" name="lemak" step="any" min="0">
+                        <input type="number" id="lemak" name="lemak" step="any" min="0" max="9999.99"
+                               value="{{angka .Bahan.Lemak}}">
                     </div>
                     <div class="field">
                         <label for="karbohidrat">Karbohidrat (g)</label>
-                        <input type="number" id="karbohidrat" name="karbohidrat" step="any" min="0">
-                    </div>
-                    <div class="field">
-                        <label for="serat">Serat (g)</label>
-                        <input type="number" id="serat" name="serat" step="any" min="0">
-                    </div>
-                    <div class="field">
-                        <label for="gula">Gula (g)</label>
-                        <input type="number" id="gula" name="gula" step="any" min="0">
+                        <input type="number" id="karbohidrat" name="karbohidrat" step="any" min="0" max="9999.99"
+                               value="{{angka .Bahan.Karbohidrat}}">
                     </div>
                 </div>
             </section>
@@ -101,54 +85,25 @@
                 <h3>Mineral &amp; Vitamin <span class="hint">per 100 g</span></h3>
                 <div class="form-grid">
                     <div class="field">
-                        <label for="natrium">Natrium (mg)</label>
-                        <input type="number" id="natrium" name="natrium" step="any" min="0">
-                    </div>
-                    <div class="field">
-                        <label for="kolesterol">Kolesterol (mg)</label>
-                        <input type="number" id="kolesterol" name="kolesterol" step="any" min="0">
-                    </div>
-                    <div class="field">
-                        <label for="kalsium">Kalsium (mg)</label>
-                        <input type="number" id="kalsium" name="kalsium" step="any" min="0">
-                    </div>
-                    <div class="field">
                         <label for="zat_besi">Zat Besi (mg)</label>
-                        <input type="number" id="zat_besi" name="zat_besi" step="any" min="0">
+                        <input type="number" id="zat_besi" name="zat_besi" step="any" min="0" max="9999.99"
+                               value="{{angka .Bahan.ZatBesi}}">
                     </div>
                     <div class="field">
-                        <label for="kalium">Kalium (mg)</label>
-                        <input type="number" id="kalium" name="kalium" step="any" min="0">
+                        <label for="seng">Seng (mg)</label>
+                        <input type="number" id="seng" name="seng" step="any" min="0" max="9999.99"
+                               value="{{angka .Bahan.Seng}}">
                     </div>
                     <div class="field">
                         <label for="vitamin_a">Vitamin A (mcg)</label>
-                        <input type="number" id="vitamin_a" name="vitamin_a" step="any" min="0">
+                        <input type="number" id="vitamin_a" name="vitamin_a" step="any" min="0" max="9999.99"
+                               value="{{angka .Bahan.VitaminA}}">
                     </div>
                     <div class="field">
                         <label for="vitamin_c">Vitamin C (mg)</label>
-                        <input type="number" id="vitamin_c" name="vitamin_c" step="any" min="0">
+                        <input type="number" id="vitamin_c" name="vitamin_c" step="any" min="0" max="9999.99"
+                               value="{{angka .Bahan.VitaminC}}">
                     </div>
-                </div>
-            </section>
-
-            <!-- TAMBAHAN -->
-            <section class="form-card">
-                <h3>Tambahan</h3>
-
-                <div class="field">
-                    <label>Alergen</label>
-                    <div class="checkbox-group">
-                        <label class="check"><input type="checkbox" name="alergen" value="Kacang"> Kacang</label>
-                        <label class="check"><input type="checkbox" name="alergen" value="Susu"> Susu</label>
-                        <label class="check"><input type="checkbox" name="alergen" value="Telur"> Telur</label>
-                        <label class="check"><input type="checkbox" name="alergen" value="Seafood"> Seafood</label>
-                        <label class="check"><input type="checkbox" name="alergen" value="Gluten"> Gluten</label>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label for="sumber_data">Sumber Data</label>
-                    <input type="text" id="sumber_data" name="sumber_data" placeholder="TKPI, USDA, label kemasan">
                 </div>
             </section>
 

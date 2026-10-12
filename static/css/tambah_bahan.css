@@ -80,7 +80,7 @@ body {
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 18px;
 }
 
@@ -127,29 +127,6 @@ body {
     box-shadow: 0 0 0 3px rgba(61, 122, 85, 0.12);
 }
 
-.checkbox-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.checkbox-group .check {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border: 1px solid #dbe6df;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: normal;
-    color: #26352d;
-    cursor: pointer;
-}
-
-.checkbox-group .check:hover {
-    background: #eef5f0;
-}
-
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -186,6 +163,14 @@ body {
     background: #d3e6da;
 }
 
+/* Layar sedang: form jadi 2 kolom */
+@media (max-width: 900px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* HP: form jadi 1 kolom */
 @media (max-width: 700px) {
     .header {
         padding: 18px 20px;

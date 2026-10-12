@@ -4,14 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
-
-	// Membaca .env (diabaikan kalau tidak ada)
-	godotenv.Load()
 
 	// Koneksi database
 	if err := initDB(); err != nil {

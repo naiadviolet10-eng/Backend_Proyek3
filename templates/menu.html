@@ -49,7 +49,7 @@
         <section class="page-header">
             <div>
                 <h2>Kelola Menu</h2>
-                <p>Setiap menu berisi resep. Gizi dan alergen menu dihitung otomatis dari resep di dalamnya.</p>
+                <p>Setiap menu berisi resep. Gizi menu dihitung otomatis dari resep di dalamnya.</p>
             </div>
             <a href="/menu/tambah" class="add-button">+ Tambah Menu</a>
         </section>
@@ -82,13 +82,6 @@
                     </form>
                 </div>
             </div>
-
-            {{if $m.Alergen}}
-            <div class="peringatan">
-                <strong>Alergen:</strong>
-                {{range $m.Alergen}}<span class="badge">{{.}}</span>{{end}}
-            </div>
-            {{end}}
 
             <p class="label-kecil">Resep dalam menu ini</p>
             <table class="tabel-kecil">
@@ -158,7 +151,6 @@
                         <th>Protein<small>(g/porsi)</small></th>
                         <th>Lemak<small>(g/porsi)</small></th>
                         <th>Karbohidrat<small>(g/porsi)</small></th>
-                        <th>Alergen</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -173,7 +165,6 @@
                         <td>{{f1 $r.PerPorsi.Protein}}</td>
                         <td>{{f1 $r.PerPorsi.Lemak}}</td>
                         <td>{{f1 $r.PerPorsi.Karbohidrat}}</td>
-                        <td>{{range $r.Alergen}}<span class="badge">{{.}}</span>{{else}}-{{end}}</td>
                         <td>
                             <a href="/resep/{{$r.ID}}" class="btn-detail">Detail</a>
                             <a href="/resep/{{$r.ID}}/edit" class="btn-edit">Edit</a>
@@ -185,7 +176,7 @@
                     </tr>
                     {{else}}
                     <tr>
-                        <td colspan="10" class="empty">Belum ada resep.</td>
+                        <td colspan="9" class="empty">Belum ada resep.</td>
                     </tr>
                     {{end}}
                 </tbody>

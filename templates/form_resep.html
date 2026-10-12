@@ -41,7 +41,7 @@
             </section>
 
             <section class="form-card">
-                <h3>Bahan <span class="hint">jumlah dalam satuan yang tertulis di kurung</span></h3>
+                <h3>Bahan <span class="hint">jumlah dalam gram</span></h3>
 
                 {{if not .Opsi}}
                 <p class="peringatan">Belum ada bahan pangan. <a href="/bahan/tambah">Tambah bahan dulu</a> sebelum membuat resep.</p>
@@ -57,7 +57,7 @@
                             <option value="{{.ID}}" {{if eq .ID $bid}}selected{{end}}>{{.Label}}</option>
                             {{end}}
                         </select>
-                        <input type="number" name="jumlah" step="any" min="0" value="{{angka .Jumlah}}" placeholder="Jumlah" required>
+                        <input type="number" name="jumlah" step="any" min="0" value="{{angka .Jumlah}}" placeholder="Jumlah (g)" required>
                         <button type="button" class="btn-hapus-baris" title="Hapus baris">✕</button>
                     </div>
                     {{end}}
@@ -89,7 +89,7 @@
                 <option value="{{.ID}}">{{.Label}}</option>
                 {{end}}
             </select>
-            <input type="number" name="jumlah" step="any" min="0" placeholder="Jumlah" required>
+            <input type="number" name="jumlah" step="any" min="0" placeholder="Jumlah (g)" required>
             <button type="button" class="btn-hapus-baris" title="Hapus baris">✕</button>
         </div>
     </template>

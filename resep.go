@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -16,7 +15,7 @@ import (
 // Satu baris bahan di dalam resep (hanya menyimpan referensi ke bahan)
 type BahanResep struct {
 	BahanID int
-	Jumlah  float64 // dalam satuan bahan; gram kalau bahan tidak punya berat/satuan
+	Jumlah  float64 // dalam gram
 }
 
 type Resep struct {
@@ -28,9 +27,10 @@ type Resep struct {
 	Bahan     []BahanResep
 }
 
+// Total gizi (sesuai kolom di tabel ingredients_master)
 type Gizi struct {
 	Kalori, Protein, Lemak, Karbohidrat float64
-	Serat, Gula, Natrium, Kolesterol    float64
+	ZatBesi, Seng, VitaminA, VitaminC   float64
 }
 
 // Baris bahan yang sudah siap ditampilkan
@@ -47,7 +47,6 @@ type ResepView struct {
 	Baris    []BarisBahan
 	Total    Gizi
 	PerPorsi Gizi
-	Alergen  []string
 }
 
 // Pilihan bahan di dropdown form
@@ -85,42 +84,31 @@ func petaBahan(daftar []Bahan) map[int]Bahan {
 }
 
 // Menghitung gizi resep dari data bahan terbaru.
-// gizi = nilai per 100 g x (jumlah x berat per satuan x BDD/100) / 100
+// Jumlah bahan dalam gram, nilai gizi bahan per 100 g:
+// gizi = nilai per 100 g x jumlah gram / 100
 func hitungView(r Resep, bahan map[int]Bahan) ResepView {
 	v := ResepView{Resep: r}
-	set := map[string]bool{}
 
 	for _, br := range r.Bahan {
 		b, ada := bahan[br.BahanID]
 		if !ada {
-			v.Baris = append(v.Baris, BarisBahan{Nama: "(bahan tidak ditemukan)", Jumlah: br.Jumlah})
+			v.Baris = append(v.Baris, BarisBahan{Nama: "(bahan tidak ditemukan)", Jumlah: br.Jumlah, Satuan: "g"})
 			continue
 		}
 
 		gram := br.Jumlah
-		satuan := "g"
-		if b.BeratPerSatuan > 0 {
-			gram = br.Jumlah * b.BeratPerSatuan
-			satuan = b.Satuan
-		}
-
-		// Bagian yang dapat dimakan, lalu skala dari per-100 g
-		f := gram * b.BDD / 100 / 100
+		f := gram / 100
 
 		v.Total.Kalori += b.Kalori * f
 		v.Total.Protein += b.Protein * f
 		v.Total.Lemak += b.Lemak * f
 		v.Total.Karbohidrat += b.Karbohidrat * f
-		v.Total.Serat += b.Serat * f
-		v.Total.Gula += b.Gula * f
-		v.Total.Natrium += b.Natrium * f
-		v.Total.Kolesterol += b.Kolesterol * f
+		v.Total.ZatBesi += b.ZatBesi * f
+		v.Total.Seng += b.Seng * f
+		v.Total.VitaminA += b.VitaminA * f
+		v.Total.VitaminC += b.VitaminC * f
 
-		for _, a := range b.Alergen {
-			set[a] = true
-		}
-
-		v.Baris = append(v.Baris, BarisBahan{Nama: b.NamaBahan, Jumlah: br.Jumlah, Satuan: satuan, Gram: gram})
+		v.Baris = append(v.Baris, BarisBahan{Nama: b.NamaBahan, Jumlah: br.Jumlah, Satuan: "g", Gram: gram})
 	}
 
 	porsi := float64(r.Porsi)
@@ -130,14 +118,11 @@ func hitungView(r Resep, bahan map[int]Bahan) ResepView {
 	t := v.Total
 	v.PerPorsi = Gizi{
 		Kalori: t.Kalori / porsi, Protein: t.Protein / porsi, Lemak: t.Lemak / porsi,
-		Karbohidrat: t.Karbohidrat / porsi, Serat: t.Serat / porsi, Gula: t.Gula / porsi,
-		Natrium: t.Natrium / porsi, Kolesterol: t.Kolesterol / porsi,
+		Karbohidrat: t.Karbohidrat / porsi,
+		ZatBesi:     t.ZatBesi / porsi, Seng: t.Seng / porsi,
+		VitaminA: t.VitaminA / porsi, VitaminC: t.VitaminC / porsi,
 	}
 
-	for a := range set {
-		v.Alergen = append(v.Alergen, a)
-	}
-	sort.Strings(v.Alergen)
 	return v
 }
 
@@ -203,12 +188,9 @@ func tampilkanFormResep(w http.ResponseWriter, r *http.Request, data FormResep) 
 		return
 	}
 
+	// Jumlah bahan di resep dihitung dalam gram
 	for _, b := range daftar {
-		satuan := "gram"
-		if b.BeratPerSatuan > 0 && b.Satuan != "" {
-			satuan = b.Satuan
-		}
-		data.Opsi = append(data.Opsi, BahanOpsi{ID: b.ID, Label: fmt.Sprintf("%s (%s)", b.NamaBahan, satuan)})
+		data.Opsi = append(data.Opsi, BahanOpsi{ID: b.ID, Label: b.NamaBahan})
 	}
 
 	renderResep(w, "form_resep.html", data)

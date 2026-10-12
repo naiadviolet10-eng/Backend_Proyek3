@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
-
 // =====================================================
 // UBAH DI SINI kalau mau ganti username dan password
 // (username harus huruf kecil semua)
@@ -43,6 +43,14 @@ func init() {
 		panic(err)
 	}
 	users[loginUsername] = string(h)
+
+	store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   60 * 60 * 3, // login berlaku 3 jam
+		HttpOnly: true,
+		Secure:   false, // ganti true kalau sudah pakai HTTPS
+		SameSite: http.SameSiteLaxMode,
+	}
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {

@@ -11,30 +11,29 @@ import (
 
 // =========================
 // STRUKTUR DATA BAHAN PANGAN
+// (sesuai tabel ingredients_master)
 // =========================
 
 type Bahan struct {
-	ID             int
-	NamaBahan      string
-	Kategori       string
-	Satuan         string
-	BeratPerSatuan float64
-	BDD            float64
-	Kalori         float64
-	Protein        float64
-	Lemak          float64
-	Karbohidrat    float64
-	Serat          float64
-	Gula           float64
-	Natrium        float64
-	Kolesterol     float64
-	Kalsium        float64
-	ZatBesi        float64
-	Kalium         float64
-	VitaminA       float64
-	VitaminC       float64
-	Alergen        []string
-	SumberData     string
+	ID          int
+	KategoriID  int    // category_id
+	Kategori    string // nama kategori (hasil JOIN)
+	NamaBahan   string // name
+	Satuan      string // default_unit
+	Kalori      float64
+	Protein     float64
+	Lemak       float64
+	Karbohidrat float64
+	ZatBesi     float64
+	Seng        float64
+	VitaminA    float64
+	VitaminC    float64
+}
+
+// Satu baris dari tabel ingredient_categories
+type Kategori struct {
+	ID   int
+	Nama string
 }
 
 // Data yang dikirim ke form tambah/edit
@@ -42,34 +41,11 @@ type FormBahan struct {
 	Judul          string
 	Action         string
 	Bahan          Bahan
-	DaftarKategori []string
-	DaftarAlergen  []string
+	DaftarKategori []Kategori
 }
 
-var daftarKategori = []string{
-	"Karbohidrat",
-	"Protein Hewani",
-	"Protein Nabati",
-	"Sayuran",
-	"Buah",
-	"Susu & Olahannya",
-	"Lemak & Minyak",
-	"Bumbu",
-	"Lainnya",
-}
-
-var daftarAlergen = []string{
-	"Kacang Tanah",
-	"Kacang Pohon",
-	"Kedelai",
-	"Susu",
-	"Telur",
-	"Ikan",
-	"Krustasea",
-	"Moluska",
-	"Gluten",
-	"Wijen",
-}
+// Batas nilai kolom numeric(6,2)
+const batasAngka = 9999.99
 
 // =========================
 // HELPER
@@ -101,60 +77,70 @@ func bacaForm(r *http.Request) (Bahan, string) {
 	if nama == "" {
 		return Bahan{}, "Nama bahan wajib diisi"
 	}
-
-	// BDD default 100% kalau dikosongkan
-	bdd := 100.0
-	if strings.TrimSpace(r.FormValue("bdd")) != "" {
-		bdd = parseFloat(r.FormValue("bdd"))
+	if len(nama) > 100 {
+		return Bahan{}, "Nama bahan maksimal 100 karakter"
 	}
 
-	return Bahan{
-		NamaBahan:      nama,
-		Kategori:       r.FormValue("kategori"),
-		Satuan:         r.FormValue("satuan"),
-		BeratPerSatuan: parseFloat(r.FormValue("berat_per_satuan")),
-		BDD:            bdd,
-		Kalori:         parseFloat(r.FormValue("kalori")),
-		Protein:        parseFloat(r.FormValue("protein")),
-		Lemak:          parseFloat(r.FormValue("lemak")),
-		Karbohidrat:    parseFloat(r.FormValue("karbohidrat")),
-		Serat:          parseFloat(r.FormValue("serat")),
-		Gula:           parseFloat(r.FormValue("gula")),
-		Natrium:        parseFloat(r.FormValue("natrium")),
-		Kolesterol:     parseFloat(r.FormValue("kolesterol")),
-		Kalsium:        parseFloat(r.FormValue("kalsium")),
-		ZatBesi:        parseFloat(r.FormValue("zat_besi")),
-		Kalium:         parseFloat(r.FormValue("kalium")),
-		VitaminA:       parseFloat(r.FormValue("vitamin_a")),
-		VitaminC:       parseFloat(r.FormValue("vitamin_c")),
-		Alergen:        r.Form["alergen"],
-		SumberData:     r.FormValue("sumber_data"),
-	}, ""
+	kategoriID, err := strconv.Atoi(r.FormValue("kategori_id"))
+	if err != nil || kategoriID <= 0 {
+		return Bahan{}, "Kategori wajib dipilih"
+	}
+
+	satuan := strings.TrimSpace(r.FormValue("satuan"))
+	if satuan == "" {
+		return Bahan{}, "Satuan wajib diisi"
+	}
+	if len(satuan) > 20 {
+		return Bahan{}, "Satuan maksimal 20 karakter"
+	}
+
+	b := Bahan{
+		KategoriID:  kategoriID,
+		NamaBahan:   nama,
+		Satuan:      satuan,
+		Kalori:      parseFloat(r.FormValue("kalori")),
+		Protein:     parseFloat(r.FormValue("protein")),
+		Lemak:       parseFloat(r.FormValue("lemak")),
+		Karbohidrat: parseFloat(r.FormValue("karbohidrat")),
+		ZatBesi:     parseFloat(r.FormValue("zat_besi")),
+		Seng:        parseFloat(r.FormValue("seng")),
+		VitaminA:    parseFloat(r.FormValue("vitamin_a")),
+		VitaminC:    parseFloat(r.FormValue("vitamin_c")),
+	}
+
+	// Kolom database numeric(6,2): maksimal 9999.99, tidak boleh negatif
+	for _, v := range []float64{
+		b.Kalori, b.Protein, b.Lemak, b.Karbohidrat,
+		b.ZatBesi, b.Seng, b.VitaminA, b.VitaminC,
+	} {
+		if v < 0 || v > batasAngka {
+			return Bahan{}, "Nilai gizi harus antara 0 dan 9999.99"
+		}
+	}
+
+	return b, ""
 }
 
 // =========================
 // FORM TAMBAH / EDIT BAHAN
 // =========================
 
-func tampilkanForm(w http.ResponseWriter, data FormBahan) {
+func tampilkanForm(w http.ResponseWriter, r *http.Request, data FormBahan) {
 
-	data.DaftarKategori = daftarKategori
-	data.DaftarAlergen = daftarAlergen
+	kategori, err := dbSemuaKategori(r.Context())
+	if err != nil {
+		galat(w, "Gagal membaca daftar kategori", err)
+		return
+	}
+	data.DaftarKategori = kategori
 
 	funcs := template.FuncMap{
+		// Angka 0 ditampilkan kosong supaya form tidak penuh "0"
 		"angka": func(f float64) string {
 			if f == 0 {
 				return ""
 			}
 			return strconv.FormatFloat(f, 'f', -1, 64)
-		},
-		"has": func(list []string, s string) bool {
-			for _, v := range list {
-				if v == s {
-					return true
-				}
-			}
-			return false
 		},
 	}
 
@@ -229,10 +215,9 @@ func tambahBahanPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tampilkanForm(w, FormBahan{
+	tampilkanForm(w, r, FormBahan{
 		Judul:  "Tambah Bahan",
 		Action: "/bahan/tambah",
-		Bahan:  Bahan{BDD: 100},
 	})
 }
 
@@ -301,7 +286,7 @@ func editBahan(w http.ResponseWriter, r *http.Request, id int) {
 		return
 	}
 
-	tampilkanForm(w, FormBahan{
+	tampilkanForm(w, r, FormBahan{
 		Judul:  "Edit Bahan",
 		Action: fmt.Sprintf("/bahan/%d/edit", id),
 		Bahan:  bahan,

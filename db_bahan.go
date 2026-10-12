@@ -6,10 +6,12 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-const kolomBahan = `id, nama_bahan, COALESCE(kategori,''), COALESCE(satuan,''),
-	berat_per_satuan, bdd, kalori, protein, lemak, karbohidrat, serat, gula,
-	natrium, kolesterol, kalsium, zat_besi, kalium, vitamin_a, vitamin_c,
-	alergen, COALESCE(sumber_data,'')`
+// Kolom yang dibaca dari tabel ingredients_master (alias m)
+// dan nama kategori dari ingredient_categories (alias c).
+// Angka numeric diubah ke float8 supaya mudah dibaca ke float64.
+const kolomBahan = `m.id, m.category_id, COALESCE(c.name,''), m.name, m.default_unit,
+	m.calories_per_100g::float8, m.protein_g::float8, m.fat_g::float8, m.carbs_g::float8,
+	m.iron_mg::float8, m.zinc_mg::float8, m.vitamin_a_mcg::float8, m.vitamin_c_mg::float8`
 
 type pemindai interface {
 	Scan(dest ...any) error
@@ -18,30 +20,47 @@ type pemindai interface {
 func pindaiBahan(row pemindai) (Bahan, error) {
 	var b Bahan
 	err := row.Scan(
-		&b.ID, &b.NamaBahan, &b.Kategori, &b.Satuan,
-		&b.BeratPerSatuan, &b.BDD, &b.Kalori, &b.Protein, &b.Lemak,
-		&b.Karbohidrat, &b.Serat, &b.Gula, &b.Natrium, &b.Kolesterol,
-		&b.Kalsium, &b.ZatBesi, &b.Kalium, &b.VitaminA, &b.VitaminC,
-		&b.Alergen, &b.SumberData,
+		&b.ID, &b.KategoriID, &b.Kategori, &b.NamaBahan, &b.Satuan,
+		&b.Kalori, &b.Protein, &b.Lemak, &b.Karbohidrat,
+		&b.ZatBesi, &b.Seng, &b.VitaminA, &b.VitaminC,
 	)
 	return b, err
 }
 
-// Urutan harus sama dengan kolom di INSERT/UPDATE (20 nilai)
+// Urutan harus sama dengan kolom di INSERT/UPDATE (11 nilai)
 func argsBahan(b Bahan) []any {
-	if b.Alergen == nil {
-		b.Alergen = []string{} // kolom alergen NOT NULL
-	}
 	return []any{
-		b.NamaBahan, b.Kategori, b.Satuan, b.BeratPerSatuan, b.BDD,
-		b.Kalori, b.Protein, b.Lemak, b.Karbohidrat, b.Serat, b.Gula,
-		b.Natrium, b.Kolesterol, b.Kalsium, b.ZatBesi, b.Kalium,
-		b.VitaminA, b.VitaminC, b.Alergen, b.SumberData,
+		b.KategoriID, b.NamaBahan, b.Satuan,
+		b.Kalori, b.Protein, b.Lemak, b.Karbohidrat,
+		b.ZatBesi, b.Seng, b.VitaminA, b.VitaminC,
 	}
 }
 
+// Daftar kategori untuk dropdown di form
+func dbSemuaKategori(ctx context.Context) ([]Kategori, error) {
+	rows, err := db.Query(ctx, `SELECT id, name FROM ingredient_categories ORDER BY name`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var hasil []Kategori
+	for rows.Next() {
+		var k Kategori
+		if err := rows.Scan(&k.ID, &k.Nama); err != nil {
+			return nil, err
+		}
+		hasil = append(hasil, k)
+	}
+	return hasil, rows.Err()
+}
+
 func dbSemuaBahan(ctx context.Context) ([]Bahan, error) {
-	rows, err := db.Query(ctx, `SELECT `+kolomBahan+` FROM bahan_pangan ORDER BY nama_bahan`)
+	rows, err := db.Query(ctx, `
+		SELECT `+kolomBahan+`
+		FROM ingredients_master m
+		JOIN ingredient_categories c ON c.id = m.category_id
+		ORDER BY m.name`)
 	if err != nil {
 		return nil, err
 	}
@@ -59,17 +78,20 @@ func dbSemuaBahan(ctx context.Context) ([]Bahan, error) {
 }
 
 func dbBahanByID(ctx context.Context, id int) (Bahan, error) {
-	return pindaiBahan(db.QueryRow(ctx, `SELECT `+kolomBahan+` FROM bahan_pangan WHERE id=$1`, id))
+	return pindaiBahan(db.QueryRow(ctx, `
+		SELECT `+kolomBahan+`
+		FROM ingredients_master m
+		JOIN ingredient_categories c ON c.id = m.category_id
+		WHERE m.id = $1`, id))
 }
 
 func dbTambahBahan(ctx context.Context, b Bahan) error {
 	_, err := db.Exec(ctx, `
-		INSERT INTO bahan_pangan (
-			nama_bahan, kategori, satuan, berat_per_satuan, bdd,
-			kalori, protein, lemak, karbohidrat, serat, gula,
-			natrium, kolesterol, kalsium, zat_besi, kalium,
-			vitamin_a, vitamin_c, alergen, sumber_data
-		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)`,
+		INSERT INTO ingredients_master (
+			category_id, name, default_unit,
+			calories_per_100g, protein_g, fat_g, carbs_g,
+			iron_mg, zinc_mg, vitamin_a_mcg, vitamin_c_mg
+		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
 		argsBahan(b)...)
 	return err
 }
@@ -77,12 +99,11 @@ func dbTambahBahan(ctx context.Context, b Bahan) error {
 func dbUbahBahan(ctx context.Context, b Bahan) error {
 	args := append(argsBahan(b), b.ID)
 	tag, err := db.Exec(ctx, `
-		UPDATE bahan_pangan SET
-			nama_bahan=$1, kategori=$2, satuan=$3, berat_per_satuan=$4, bdd=$5,
-			kalori=$6, protein=$7, lemak=$8, karbohidrat=$9, serat=$10, gula=$11,
-			natrium=$12, kolesterol=$13, kalsium=$14, zat_besi=$15, kalium=$16,
-			vitamin_a=$17, vitamin_c=$18, alergen=$19, sumber_data=$20
-		WHERE id=$21`, args...)
+		UPDATE ingredients_master SET
+			category_id=$1, name=$2, default_unit=$3,
+			calories_per_100g=$4, protein_g=$5, fat_g=$6, carbs_g=$7,
+			iron_mg=$8, zinc_mg=$9, vitamin_a_mcg=$10, vitamin_c_mg=$11
+		WHERE id=$12`, args...)
 	if err != nil {
 		return err
 	}
@@ -93,6 +114,6 @@ func dbUbahBahan(ctx context.Context, b Bahan) error {
 }
 
 func dbHapusBahan(ctx context.Context, id int) error {
-	_, err := db.Exec(ctx, `DELETE FROM bahan_pangan WHERE id=$1`, id)
+	_, err := db.Exec(ctx, `DELETE FROM ingredients_master WHERE id=$1`, id)
 	return err
 }
