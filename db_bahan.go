@@ -11,7 +11,8 @@ import (
 // Angka numeric diubah ke float8 supaya mudah dibaca ke float64.
 const kolomBahan = `m.id, m.category_id, COALESCE(c.name,''), m.name, m.default_unit,
 	m.calories_per_100g::float8, m.protein_g::float8, m.fat_g::float8, m.carbs_g::float8,
-	m.iron_mg::float8, m.zinc_mg::float8, m.vitamin_a_mcg::float8, m.vitamin_c_mg::float8`
+	m.iron_mg::float8, m.zinc_mg::float8, m.vitamin_a_mcg::float8, m.vitamin_c_mg::float8,
+	COALESCE(m.image_path,'')` // BARU: foto
 
 type pemindai interface {
 	Scan(dest ...any) error
@@ -23,16 +24,18 @@ func pindaiBahan(row pemindai) (Bahan, error) {
 		&b.ID, &b.KategoriID, &b.Kategori, &b.NamaBahan, &b.Satuan,
 		&b.Kalori, &b.Protein, &b.Lemak, &b.Karbohidrat,
 		&b.ZatBesi, &b.Seng, &b.VitaminA, &b.VitaminC,
+		&b.Gambar, // BARU
 	)
 	return b, err
 }
 
-// Urutan harus sama dengan kolom di INSERT/UPDATE (11 nilai)
+// Urutan harus sama dengan kolom di INSERT/UPDATE (12 nilai)
 func argsBahan(b Bahan) []any {
 	return []any{
 		b.KategoriID, b.NamaBahan, b.Satuan,
 		b.Kalori, b.Protein, b.Lemak, b.Karbohidrat,
 		b.ZatBesi, b.Seng, b.VitaminA, b.VitaminC,
+		b.Gambar, // BARU
 	}
 }
 
@@ -90,8 +93,9 @@ func dbTambahBahan(ctx context.Context, b Bahan) error {
 		INSERT INTO ingredients_master (
 			category_id, name, default_unit,
 			calories_per_100g, protein_g, fat_g, carbs_g,
-			iron_mg, zinc_mg, vitamin_a_mcg, vitamin_c_mg
-		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+			iron_mg, zinc_mg, vitamin_a_mcg, vitamin_c_mg,
+			image_path
+		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, NULLIF($12,''))`, // BARU: image_path
 		argsBahan(b)...)
 	return err
 }
@@ -102,8 +106,9 @@ func dbUbahBahan(ctx context.Context, b Bahan) error {
 		UPDATE ingredients_master SET
 			category_id=$1, name=$2, default_unit=$3,
 			calories_per_100g=$4, protein_g=$5, fat_g=$6, carbs_g=$7,
-			iron_mg=$8, zinc_mg=$9, vitamin_a_mcg=$10, vitamin_c_mg=$11
-		WHERE id=$12`, args...)
+			iron_mg=$8, zinc_mg=$9, vitamin_a_mcg=$10, vitamin_c_mg=$11,
+			image_path=NULLIF($12,'')
+		WHERE id=$13`, args...) // BARU: image_path, id jadi $13
 	if err != nil {
 		return err
 	}

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Dapur Cerdas</title>
-    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=3">
 </head>
 <body>
 
@@ -18,7 +18,6 @@
         </div>
 
         <div class="admin-profile">
-    <div class="notification">🔔</div>
 
     <div class="profile-menu">
         <button type="button" class="profile-trigger" id="profileTrigger"
@@ -75,7 +74,7 @@
             <div class="action-grid">
 
                 <!-- BAHAN PANGAN -->
-                <a href="/bahan-pangan" class="action-card green">
+                <a href="/bahan" class="action-card green">
                     <div class="icon">
                         🌿
                     </div>
@@ -100,14 +99,14 @@
                     </div>
 
                     <div class="action-content">
-                        <h3>Menu</h3>
+                        <h3>Menu & Resep</h3>
 
                         <p>
-                            Kelola Menu berdasarkan usia dan 1000 HPK.
+                            Kelola menu untuk umum, ibu hamil, ibu menyusui, dan balita.
                         </p>
 
                         <span class="action-link">
-                            Kelola Menu
+                            Kelola Menu & Resep
                         </span>
                     </div>
                 </a>
@@ -153,7 +152,7 @@
 
                     <div>
                         <span>Total Bahan</span>
-                        <strong>120</strong>
+                        <strong>{{.TotalBahan}}</strong>
                     </div>
                 </div>
 
@@ -164,7 +163,7 @@
 
                     <div>
                         <span>Total Resep</span>
-                        <strong>85</strong>
+                        <strong>{{.TotalResep}}</strong>
                     </div>
                 </div>
 
@@ -175,7 +174,7 @@
 
                     <div>
                         <span>Total Menu</span>
-                        <strong>32</strong>
+                        <strong>{{.TotalMenu}}</strong>
                     </div>
                 </div>
 
@@ -185,8 +184,8 @@
                     </div>
 
                     <div>
-                        <span>Perlu Moderasi</span>
-                        <strong>8</strong>
+                        <span>Perlu Perhatian</span>
+                        <strong>{{.PerluPerhatian}}</strong>
                     </div>
                 </div>
 
@@ -213,68 +212,21 @@
                     </span>
                 </div>
 
-                <div class="activity-list">
-
+                                <div class="activity-list">
+                    {{range .Aktivitas}}
                     <div class="activity">
-                        <div class="activity-icon">
-                            🌿
-                        </div>
+                        <div class="activity-icon">{{.Ikon}}</div>
 
                         <div>
-                            <strong>
-                                Bahan pangan ditambahkan
-                            </strong>
-
-                            <span>
-                                Admin menambahkan data "Bayam"
-                            </span>
+                            <strong>{{.Judul}}</strong>
+                            <span>{{.Keterangan}}</span>
                         </div>
 
-                        <small>
-                            10 menit lalu
-                        </small>
+                        <small>{{.Waktu}}</small>
                     </div>
-
-                    <div class="activity">
-                        <div class="activity-icon">
-                            🍲
-                        </div>
-
-                        <div>
-                            <strong>
-                                Resep diperbarui
-                            </strong>
-
-                            <span>
-                                Resep "Nasi Ayam" telah diperbarui
-                            </span>
-                        </div>
-
-                        <small>
-                            30 menit lalu
-                        </small>
-                    </div>
-
-                    <div class="activity">
-                        <div class="activity-icon">
-                            📊
-                        </div>
-
-                        <div>
-                            <strong>
-                                Data gizi diperbarui
-                            </strong>
-
-                            <span>
-                                Informasi gizi "Telur Ayam"
-                            </span>
-                        </div>
-
-                        <small>
-                            1 jam lalu
-                        </small>
-                    </div>
-
+                    {{else}}
+                    <p class="activity-kosong">Belum ada aktivitas.</p>
+                    {{end}}
                 </div>
             </div>
 
@@ -295,37 +247,23 @@
                     </span>
                 </div>
 
-                <div class="moderation-item">
+                                <div class="moderation-item">
                     <div>
-                        <strong>
-                            Bahan Pangan
-                        </strong>
-
-                        <span>
-                            Menunggu validasi
-                        </span>
+                        <strong>Menu belum punya bahan</strong>
+                        <span>Tambahkan bahan lewat tombol Edit</span>
                     </div>
-
-                    <b>5</b>
+                    <b>{{.MenuTanpaBahan}}</b>
                 </div>
 
                 <div class="moderation-item">
                     <div>
-                        <strong>
-                            Resep AI
-                        </strong>
-
-                        <span>
-                            Menunggu moderasi
-                        </span>
+                        <strong>Menu belum punya resep</strong>
+                        <span>Menunggu resep dari AI</span>
                     </div>
-
-                    <b>3</b>
+                    <b>{{.MenuTanpaResep}}</b>
                 </div>
 
-                <button class="view-button">
-                    Lihat Semua →
-                </button>
+                <a href="/menu" class="view-button">Lihat Menu & Resep →</a>
 
             </div>
 

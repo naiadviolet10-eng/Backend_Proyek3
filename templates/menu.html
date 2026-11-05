@@ -14,7 +14,7 @@
             <img src="/static/img/logo_dapur_cerdas.png" alt="Logo Dapur Cerdas">
             <div>
                 <h1>Menu & Resep</h1>
-                <p>Kelola menu makanan dan resep di dalamnya</p>
+                <p>Susun menu dari bahan pangan, resep dibuat oleh AI</p>
             </div>
         </div>
         <a href="/dashboard" class="back-button">← Dashboard</a>
@@ -22,42 +22,69 @@
 
     <main class="container">
 
-        <!-- ===== KATEGORI MENU ===== -->
+        <!-- ===== KELOMPOK MENU (FILTER) ===== -->
         <section class="menu-category">
-            <div class="category-card age-card">
+            <a href="/menu?kelompok=Umum"
+               class="category-card umum-card {{if eq .Kelompok "Umum"}}aktif{{end}}">
+                <div class="category-icon">🍚</div>
+                <div class="category-content">
+                    <span>Untuk semua orang</span>
+                    <h3>Umum</h3>
+                    <p>Makanan bergizi seimbang untuk kebutuhan sehari-hari.</p>
+                    <strong class="category-count">{{index .Hitung "Umum"}} menu</strong>
+                </div>
+            </a>
+
+            <a href="/menu?kelompok=Ibu%20Hamil"
+               class="category-card hamil-card {{if eq .Kelompok "Ibu Hamil"}}aktif{{end}}">
+                <div class="category-icon">🤰</div>
+                <div class="category-content">
+                    <span>1000 HPK</span>
+                    <h3>Ibu Hamil</h3>
+                    <p>Menu untuk mendukung gizi ibu dan janin selama kehamilan.</p>
+                    <strong class="category-count">{{index .Hitung "Ibu Hamil"}} menu</strong>
+                </div>
+            </a>
+
+            <a href="/menu?kelompok=Ibu%20Menyusui"
+               class="category-card menyusui-card {{if eq .Kelompok "Ibu Menyusui"}}aktif{{end}}">
+                <div class="category-icon">🤱</div>
+                <div class="category-content">
+                    <span>1000 HPK</span>
+                    <h3>Ibu Menyusui</h3>
+                    <p>Menu untuk menunjang produksi ASI dan pemulihan ibu.</p>
+                    <strong class="category-count">{{index .Hitung "Ibu Menyusui"}} menu</strong>
+                </div>
+            </a>
+
+            <a href="/menu?kelompok=Balita"
+               class="category-card balita-card {{if eq .Kelompok "Balita"}}aktif{{end}}">
                 <div class="category-icon">👶</div>
                 <div class="category-content">
-                    <span>Menu Berdasarkan Usia</span>
-                    <h3>Kelompok Usia</h3>
-                    <p>Kelola menu sesuai dengan kebutuhan makanan berdasarkan kelompok usia.</p>
-                    <a href="#" class="category-button">Kelola Menu →</a>
+                    <span>1000 HPK</span>
+                    <h3>Balita</h3>
+                    <p>MPASI dan makanan anak yang sesuai dengan usianya.</p>
+                    <strong class="category-count">{{index .Hitung "Balita"}} menu</strong>
                 </div>
-            </div>
-
-            <div class="category-card hpk-card">
-                <div class="category-icon">🌱</div>
-                <div class="category-content">
-                    <span>Menu Khusus</span>
-                    <h3>1000 HPK</h3>
-                    <p>Kelola menu untuk mendukung kebutuhan gizi pada periode 1000 Hari Pertama Kehidupan.</p>
-                    <a href="#" class="category-button">Kelola Menu →</a>
-                </div>
-            </div>
+            </a>
         </section>
 
-        <!-- ===== DAFTAR MENU (RESEP ADA DI DALAMNYA) ===== -->
+        <!-- ===== DAFTAR MENU ===== -->
         <section class="page-header">
             <div>
-                <h2>Kelola Menu</h2>
-                <p>Setiap menu berisi resep. Gizi menu dihitung otomatis dari resep di dalamnya.</p>
+                <h2>{{if .Kelompok}}Menu {{.Kelompok}}{{else}}Semua Menu{{end}}</h2>
+                <p>Menu disusun dari bahan pangan. Gizi menu dihitung otomatis dari bahan di dalamnya.</p>
             </div>
-            <a href="/menu/tambah" class="add-button">+ Tambah Menu</a>
+            <a href="/menu/tambah{{if .Kelompok}}?kelompok={{urlquery .Kelompok}}{{end}}" class="add-button">+ Tambah Menu</a>
         </section>
 
         <section class="filter-section">
             <div class="search-box">
                 <input type="text" id="cari-menu" placeholder="Cari nama menu...">
             </div>
+            {{if .Kelompok}}
+            <a href="/menu" class="reset-filter">Tampilkan semua menu ×</a>
+            {{end}}
         </section>
 
         <div id="daftar-menu">
@@ -68,8 +95,8 @@
                 <div>
                     <h3 class="menu-judul"><a href="/menu/{{$m.ID}}">{{$m.Nama}}</a></h3>
                     <p class="menu-info">
-                        {{if $m.WaktuMakan}}{{$m.WaktuMakan}}{{else}}Waktu makan belum diisi{{end}}
-                        {{if $m.Tanggal}} · {{$m.Tanggal}}{{end}}
+                        <span class="tag-kelompok {{if eq $m.Kelompok "Umum"}}tag-umum{{else if eq $m.Kelompok "Ibu Hamil"}}tag-hamil{{else if eq $m.Kelompok "Ibu Menyusui"}}tag-menyusui{{else}}tag-balita{{end}}">{{$m.Kelompok}}</span>
+                        {{if $m.SasaranDetail}}{{$m.SasaranDetail}} · {{end}}{{$m.Porsi}} porsi
                         {{if $m.Deskripsi}} · {{$m.Deskripsi}}{{end}}
                     </p>
                 </div>
@@ -83,12 +110,12 @@
                 </div>
             </div>
 
-            <p class="label-kecil">Resep dalam menu ini</p>
+            <p class="label-kecil">Bahan dalam menu ini</p>
             <table class="tabel-kecil">
                 <thead>
                     <tr>
-                        <th>Resep</th>
-                        <th>Porsi</th>
+                        <th>Bahan</th>
+                        <th>Jumlah<small>(gram)</small></th>
                         <th>Kalori</th>
                         <th>Protein</th>
                         <th>Lemak</th>
@@ -96,14 +123,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{range $m.Baris}}
+                    {{range $m.Bahan}}
                     <tr>
-                        <td class="nama">{{if .ID}}<a href="/resep/{{.ID}}">{{.Nama}}</a>{{else}}{{.Nama}}{{end}}</td>
-                        <td>{{f1 .Porsi}}</td>
+                        <td class="nama">{{.Nama}}</td>
+                        <td>{{f1 .Jumlah}}</td>
                         <td>{{f1 .Gizi.Kalori}}</td>
                         <td>{{f1 .Gizi.Protein}}</td>
                         <td>{{f1 .Gizi.Lemak}}</td>
                         <td>{{f1 .Gizi.Karbohidrat}}</td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="6" class="kosong-kecil">Belum ada bahan. <a href="/menu/{{$m.ID}}/edit">Tambah bahan</a></td>
                     </tr>
                     {{end}}
                 </tbody>
@@ -115,28 +146,43 @@
                         <td><strong>{{f1 $m.Total.Lemak}}</strong></td>
                         <td><strong>{{f1 $m.Total.Karbohidrat}}</strong></td>
                     </tr>
+                    <tr>
+                        <td colspan="2"><strong>Per porsi</strong></td>
+                        <td>{{f1 $m.PerPorsi.Kalori}}</td>
+                        <td>{{f1 $m.PerPorsi.Protein}}</td>
+                        <td>{{f1 $m.PerPorsi.Lemak}}</td>
+                        <td>{{f1 $m.PerPorsi.Karbohidrat}}</td>
+                    </tr>
                 </tfoot>
             </table>
+
+            <div class="resep-ai">
+                <span class="label-kecil">Resep dari AI</span>
+                {{if $m.Resep}}
+                    {{range $m.Resep}}<a href="/resep/{{.ID}}" class="resep-chip">{{.Nama}}</a>{{end}}
+                {{else}}
+                    <span class="resep-belum">Belum ada resep untuk menu ini.</span>
+                {{end}}
+            </div>
 
         </section>
         {{else}}
         <section class="form-card">
             <div class="empty">
                 <div class="empty-icon">🍽️</div>
-                <strong>Belum ada data menu</strong>
-                <p>Menu yang ditambahkan akan muncul di halaman ini.</p>
+                <strong>Belum ada menu{{if .Kelompok}} untuk {{.Kelompok}}{{end}}</strong>
+                <p>Mulai dengan memilih bahan pangan dan jumlah gramnya.</p>
             </div>
         </section>
         {{end}}
         </div>
 
-        <!-- ===== SEMUA RESEP ===== -->
+        <!-- ===== SEMUA RESEP (HANYA DILIHAT) ===== -->
         <section class="page-header" style="margin-top:40px">
             <div>
                 <h2>Semua Resep</h2>
-                <p>Resep yang bisa dipakai di menu. Nilai gizi dihitung dari bahan dan ditampilkan per porsi.</p>
+                <p>Resep dibuat oleh AI untuk setiap menu dan hanya bisa dilihat di sini. Gizi dihitung per porsi.</p>
             </div>
-            <a href="/resep/tambah" class="add-button">+ Tambah Resep</a>
         </section>
 
         <section class="table-card">
@@ -145,6 +191,7 @@
                     <tr>
                         <th>No</th>
                         <th>Nama Resep</th>
+                        <th>Untuk Menu</th>
                         <th>Porsi</th>
                         <th>Bahan</th>
                         <th>Kalori<small>(kkal/porsi)</small></th>
@@ -159,6 +206,7 @@
                     <tr>
                         <td>{{inc $i}}</td>
                         <td class="nama"><a href="/resep/{{$r.ID}}">{{$r.Nama}}</a></td>
+                        <td class="nama">{{if $r.MenuID}}<a href="/menu/{{$r.MenuID}}">{{$r.MenuNama}}</a>{{else}}<span class="muted">-</span>{{end}}</td>
                         <td>{{$r.Porsi}}</td>
                         <td>{{len $r.Baris}} bahan</td>
                         <td>{{f1 $r.PerPorsi.Kalori}}</td>
@@ -167,16 +215,11 @@
                         <td>{{f1 $r.PerPorsi.Karbohidrat}}</td>
                         <td>
                             <a href="/resep/{{$r.ID}}" class="btn-detail">Detail</a>
-                            <a href="/resep/{{$r.ID}}/edit" class="btn-edit">Edit</a>
-                            <form action="/resep/{{$r.ID}}/hapus" method="POST" class="form-hapus"
-                                  onsubmit="return confirm('Yakin ingin menghapus resep ini?')">
-                                <button type="submit" class="btn-hapus">Hapus</button>
-                            </form>
                         </td>
                     </tr>
                     {{else}}
                     <tr>
-                        <td colspan="9" class="empty">Belum ada resep.</td>
+                        <td colspan="10" class="empty">Belum ada resep. Resep akan muncul setelah dibuat oleh AI.</td>
                     </tr>
                     {{end}}
                 </tbody>

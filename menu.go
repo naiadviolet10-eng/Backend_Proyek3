@@ -8,45 +8,69 @@ import (
 )
 
 // =========================
+// KELOMPOK MENU
+// =========================
+
+var daftarKelompok = []string{"Umum", "Ibu Hamil", "Ibu Menyusui", "Balita"}
+
+func kelompokValid(k string) bool {
+	for _, x := range daftarKelompok {
+		if x == k {
+			return true
+		}
+	}
+	return false
+}
+
+// =========================
 // STRUKTUR DATA MENU
 // =========================
 
-type ResepMenu struct {
-	ResepID int
-	Porsi   float64 // jumlah porsi resep yang disajikan di menu ini
+// Satu baris bahan di dalam menu (referensi ke ingredients_master)
+type BahanMenu struct {
+	BahanID int
+	Jumlah  float64 // dalam gram
 }
 
 type Menu struct {
-	ID         int
-	Nama       string
-	Deskripsi  string
-	Tanggal    string // format YYYY-MM-DD, boleh kosong
-	WaktuMakan string
-	Resep      []ResepMenu
+	ID            int
+	Nama          string
+	Deskripsi     string
+	Kelompok      string // Umum / Ibu Hamil / Ibu Menyusui / Balita
+	SasaranDetail string // contoh: Trimester 2, Usia 6-8 bulan (boleh kosong)
+	Porsi         int
+	Isi           []BahanMenu
 }
 
-type BarisResep struct {
-	ID    int
-	Nama  string
-	Porsi float64
-	Gizi  Gizi // total gizi baris ini (gizi per porsi x porsi)
+// Baris bahan yang sudah siap ditampilkan (dengan gizinya)
+type BarisBahanMenu struct {
+	Nama   string
+	Jumlah float64
+	Gizi   Gizi // gizi baris ini = nilai per 100 g x gram / 100
 }
 
+// Resep AI yang menempel ke sebuah menu (hanya untuk ditampilkan)
+type ResepRingkas struct {
+	ID   int
+	Nama string
+}
+
+// Menu + hasil perhitungan, dikirim ke template
 type MenuView struct {
 	Menu
-	Baris []BarisResep
-	Total Gizi
+	Bahan    []BarisBahanMenu
+	Total    Gizi
+	PerPorsi Gizi
+	Resep    []ResepRingkas
 }
 
 type FormMenu struct {
-	Judul       string
-	Action      string
-	Menu        Menu
-	Opsi        []BahanOpsi // dropdown resep (ID + label)
-	DaftarWaktu []string
+	Judul          string
+	Action         string
+	Menu           Menu
+	Opsi           []BahanOpsi // dropdown bahan (ID + nama)
+	DaftarKelompok []string
 }
-
-var daftarWaktuMakan = []string{"Sarapan", "Makan Siang", "Makan Malam", "Selingan"}
 
 // Menambahkan gizi b (dikali k) ke gizi a
 func tambahGizi(a, b Gizi, k float64) Gizi {
@@ -61,25 +85,41 @@ func tambahGizi(a, b Gizi, k float64) Gizi {
 	return a
 }
 
-// Menghitung gizi menu dari resep-resepnya
-func hitungMenu(m Menu, resep map[int]ResepView) MenuView {
-	v := MenuView{Menu: m}
+// Nilai gizi bahan per 100 g
+func giziPer100(b Bahan) Gizi {
+	return Gizi{
+		Kalori: b.Kalori, Protein: b.Protein, Lemak: b.Lemak, Karbohidrat: b.Karbohidrat,
+		ZatBesi: b.ZatBesi, Seng: b.Seng, VitaminA: b.VitaminA, VitaminC: b.VitaminC,
+	}
+}
 
-	for _, rm := range m.Resep {
-		rv, ada := resep[rm.ResepID]
+// Menghitung gizi menu langsung dari bahan-bahannya.
+// gizi = nilai per 100 g x jumlah gram / 100
+func hitungMenu(m Menu, bahan map[int]Bahan, resep []ResepRingkas) MenuView {
+	v := MenuView{Menu: m, Resep: resep}
+
+	for _, bm := range m.Isi {
+		b, ada := bahan[bm.BahanID]
 		if !ada {
-			v.Baris = append(v.Baris, BarisResep{Nama: "(resep tidak ditemukan)", Porsi: rm.Porsi})
+			v.Bahan = append(v.Bahan, BarisBahanMenu{Nama: "(bahan tidak ditemukan)", Jumlah: bm.Jumlah})
 			continue
 		}
-		g := tambahGizi(Gizi{}, rv.PerPorsi, rm.Porsi)
-		v.Total = tambahGizi(v.Total, rv.PerPorsi, rm.Porsi)
-		v.Baris = append(v.Baris, BarisResep{ID: rv.ID, Nama: rv.Nama, Porsi: rm.Porsi, Gizi: g})
+		faktor := bm.Jumlah / 100
+		g := tambahGizi(Gizi{}, giziPer100(b), faktor)
+		v.Total = tambahGizi(v.Total, giziPer100(b), faktor)
+		v.Bahan = append(v.Bahan, BarisBahanMenu{Nama: b.NamaBahan, Jumlah: bm.Jumlah, Gizi: g})
 	}
+
+	porsi := float64(m.Porsi)
+	if porsi < 1 {
+		porsi = 1
+	}
+	v.PerPorsi = tambahGizi(Gizi{}, v.Total, 1/porsi)
 
 	return v
 }
 
-// Menyiapkan perhitungan semua resep
+// Menyiapkan perhitungan semua resep (resep hanya dibaca)
 func muatResepView(r *http.Request) (map[int]ResepView, []Resep, error) {
 	ctx := r.Context()
 	daftar, err := dbSemuaResep(ctx)
@@ -108,46 +148,55 @@ func bacaFormMenu(r *http.Request) (Menu, string) {
 		return Menu{}, "Nama menu wajib diisi"
 	}
 
-	ids := r.Form["resep_id"]
-	por := r.Form["jumlah_porsi"]
-	var resep []ResepMenu
+	kelompok := r.FormValue("kelompok")
+	if !kelompokValid(kelompok) {
+		return Menu{}, "Kelompok menu tidak valid"
+	}
+
+	porsi, _ := strconv.Atoi(strings.TrimSpace(r.FormValue("porsi")))
+	if porsi < 1 {
+		porsi = 1
+	}
+
+	// bahan_id dan jumlah dikirim berurutan, satu pasang per baris
+	ids := r.Form["bahan_id"]
+	jml := r.Form["jumlah"]
+	var isi []BahanMenu
 	for i := range ids {
-		if i >= len(por) {
+		if i >= len(jml) {
 			break
 		}
 		id, err := strconv.Atoi(ids[i])
-		p := parseFloat(por[i])
-		if err != nil || p <= 0 {
+		j := parseFloat(jml[i])
+		if err != nil || j <= 0 {
 			continue
 		}
-		resep = append(resep, ResepMenu{ResepID: id, Porsi: p})
+		isi = append(isi, BahanMenu{BahanID: id, Jumlah: j})
 	}
-	if len(resep) == 0 {
-		return Menu{}, "Menu harus punya minimal satu resep dengan porsi lebih dari 0"
+	if len(isi) == 0 {
+		return Menu{}, "Menu harus punya minimal satu bahan dengan jumlah lebih dari 0"
 	}
 
 	return Menu{
-		Nama:       nama,
-		Deskripsi:  strings.TrimSpace(r.FormValue("deskripsi")),
-		Tanggal:    strings.TrimSpace(r.FormValue("tanggal")),
-		WaktuMakan: r.FormValue("waktu_makan"),
-		Resep:      resep,
+		Nama:          nama,
+		Deskripsi:     strings.TrimSpace(r.FormValue("deskripsi")),
+		Kelompok:      kelompok,
+		SasaranDetail: strings.TrimSpace(r.FormValue("sasaran_detail")),
+		Porsi:         porsi,
+		Isi:           isi,
 	}, ""
 }
 
 func tampilkanFormMenu(w http.ResponseWriter, r *http.Request, data FormMenu) {
-	daftar, err := dbSemuaResep(r.Context())
+	daftar, err := dbSemuaBahan(r.Context())
 	if err != nil {
-		galat(w, "Gagal membaca data resep", err)
+		galat(w, "Gagal membaca data bahan", err)
 		return
 	}
-	for _, rs := range daftar {
-		data.Opsi = append(data.Opsi, BahanOpsi{
-			ID:    rs.ID,
-			Label: fmt.Sprintf("%s (%d porsi)", rs.Nama, rs.Porsi),
-		})
+	for _, b := range daftar {
+		data.Opsi = append(data.Opsi, BahanOpsi{ID: b.ID, Label: b.NamaBahan})
 	}
-	data.DaftarWaktu = daftarWaktuMakan
+	data.DaftarKelompok = daftarKelompok
 	renderResep(w, "form_menu.html", data)
 }
 
@@ -155,33 +204,65 @@ func tampilkanFormMenu(w http.ResponseWriter, r *http.Request, data FormMenu) {
 // HANDLER
 // =========================
 
-// Halaman gabungan: daftar menu (dengan resep di dalamnya) + semua resep
+// Halaman gabungan: daftar menu (filter kelompok) + semua resep (hanya dilihat)
+// /menu  atau  /menu?kelompok=Ibu%20Hamil
 func menuListPage(w http.ResponseWriter, r *http.Request) {
-	peta, daftarResep, err := muatResepView(r)
+	ctx := r.Context()
+
+	kelompok := r.URL.Query().Get("kelompok")
+	if !kelompokValid(kelompok) {
+		kelompok = "" // tampilkan semua
+	}
+
+	bahan, err := dbSemuaBahan(ctx)
 	if err != nil {
-		galat(w, "Gagal membaca data resep", err)
+		galat(w, "Gagal membaca data bahan", err)
 		return
 	}
-	daftar, err := dbSemuaMenu(r.Context())
+	peta := petaBahan(bahan)
+
+	daftar, err := dbSemuaMenu(ctx, kelompok)
 	if err != nil {
 		galat(w, "Gagal membaca data menu", err)
+		return
+	}
+	hitung, err := dbHitungMenu(ctx)
+	if err != nil {
+		galat(w, "Gagal menghitung menu per kelompok", err)
+		return
+	}
+	perResep, perMenu, err := muatTautan(r)
+	if err != nil {
+		galat(w, "Gagal membaca resep per menu", err)
 		return
 	}
 
 	menus := make([]MenuView, 0, len(daftar))
 	for _, m := range daftar {
-		menus = append(menus, hitungMenu(m, peta))
+		menus = append(menus, hitungMenu(m, peta, perMenu[m.ID]))
 	}
 
+	petaResep, daftarResep, err := muatResepView(r)
+	if err != nil {
+		galat(w, "Gagal membaca data resep", err)
+		return
+	}
 	reseps := make([]ResepView, 0, len(daftarResep))
 	for _, rs := range daftarResep {
-		reseps = append(reseps, peta[rs.ID])
+		rv := petaResep[rs.ID]
+		if t, ada := perResep[rs.ID]; ada {
+			rv.MenuID = t.MenuID
+			rv.MenuNama = t.MenuNama
+		}
+		reseps = append(reseps, rv)
 	}
 
 	renderResep(w, "menu.html", struct {
+		Kelompok    string
+		Hitung      map[string]int
 		DaftarMenu  []MenuView
 		DaftarResep []ResepView
-	}{menus, reseps})
+	}{kelompok, hitung, menus, reseps})
 }
 
 func tambahMenuPage(w http.ResponseWriter, r *http.Request) {
@@ -195,13 +276,20 @@ func tambahMenuPage(w http.ResponseWriter, r *http.Request) {
 			galat(w, "Gagal menyimpan menu", err)
 			return
 		}
-		http.Redirect(w, r, "/menu", http.StatusSeeOther)
+		http.Redirect(w, r, "/menu?kelompok="+m.Kelompok, http.StatusSeeOther)
 		return
+	}
+
+	// kelompok awal diambil dari ?kelompok= (kartu yang sedang dipilih)
+	kelompok := r.URL.Query().Get("kelompok")
+	if !kelompokValid(kelompok) {
+		kelompok = "Umum"
 	}
 
 	tampilkanFormMenu(w, r, FormMenu{
 		Judul:  "Tambah Menu",
 		Action: "/menu/tambah",
+		Menu:   Menu{Kelompok: kelompok, Porsi: 1},
 	})
 }
 
@@ -232,7 +320,9 @@ func aksiMenuPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func detailMenu(w http.ResponseWriter, r *http.Request, id int) {
-	m, err := dbMenuByID(r.Context(), id)
+	ctx := r.Context()
+
+	m, err := dbMenuByID(ctx, id)
 	if err != nil {
 		if tidakAda(err) {
 			http.NotFound(w, r)
@@ -241,12 +331,18 @@ func detailMenu(w http.ResponseWriter, r *http.Request, id int) {
 		galat(w, "Gagal membaca menu", err)
 		return
 	}
-	peta, _, err := muatResepView(r)
+	bahan, err := dbSemuaBahan(ctx)
 	if err != nil {
-		galat(w, "Gagal membaca data resep", err)
+		galat(w, "Gagal membaca data bahan", err)
 		return
 	}
-	renderResep(w, "detail_menu.html", hitungMenu(m, peta))
+	_, perMenu, err := muatTautan(r)
+	if err != nil {
+		galat(w, "Gagal membaca resep menu", err)
+		return
+	}
+
+	renderResep(w, "detail_menu.html", hitungMenu(m, petaBahan(bahan), perMenu[m.ID]))
 }
 
 func editMenu(w http.ResponseWriter, r *http.Request, id int) {
@@ -265,7 +361,7 @@ func editMenu(w http.ResponseWriter, r *http.Request, id int) {
 			galat(w, "Gagal menyimpan perubahan menu", err)
 			return
 		}
-		http.Redirect(w, r, "/menu", http.StatusSeeOther)
+		http.Redirect(w, r, "/menu?kelompok="+baru.Kelompok, http.StatusSeeOther)
 		return
 	}
 
@@ -296,4 +392,24 @@ func hapusMenu(w http.ResponseWriter, r *http.Request, id int) {
 		return
 	}
 	http.Redirect(w, r, "/menu", http.StatusSeeOther)
+}
+
+// =========================
+// TAUTAN RESEP <-> MENU (hanya baca)
+// =========================
+
+// Mengembalikan resep per resep_id (untuk kolom "Untuk Menu")
+// dan daftar resep per menu_id (untuk bagian "Resep dari AI").
+func muatTautan(r *http.Request) (map[int]ResepTaut, map[int][]ResepRingkas, error) {
+	daftar, err := dbResepTaut(r.Context())
+	if err != nil {
+		return nil, nil, err
+	}
+	perResep := make(map[int]ResepTaut, len(daftar))
+	perMenu := make(map[int][]ResepRingkas)
+	for _, t := range daftar {
+		perResep[t.ResepID] = t
+		perMenu[t.MenuID] = append(perMenu[t.MenuID], ResepRingkas{ID: t.ResepID, Nama: t.Nama})
+	}
+	return perResep, perMenu, nil
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -10,6 +9,7 @@ import (
 
 // =========================
 // STRUKTUR DATA RESEP
+// Resep dibuat oleh AI dan hanya dibaca oleh aplikasi ini.
 // =========================
 
 // Satu baris bahan di dalam resep (hanya menyimpan referensi ke bahan)
@@ -47,19 +47,14 @@ type ResepView struct {
 	Baris    []BarisBahan
 	Total    Gizi
 	PerPorsi Gizi
+	MenuID   int    // 0 jika resep belum menempel ke menu
+	MenuNama string // nama menu tempat resep ini menempel
 }
 
-// Pilihan bahan di dropdown form
+// Pilihan bahan di dropdown form (dipakai form menu)
 type BahanOpsi struct {
 	ID    int
 	Label string
-}
-
-type FormResep struct {
-	Judul  string
-	Action string
-	Resep  Resep
-	Opsi   []BahanOpsi
 }
 
 var funcsResep = template.FuncMap{
@@ -137,67 +132,8 @@ func renderResep(w http.ResponseWriter, file string, data any) {
 	}
 }
 
-// Membaca isian form resep (ID diisi oleh pemanggil)
-func bacaFormResep(r *http.Request) (Resep, string) {
-	if err := r.ParseForm(); err != nil {
-		return Resep{}, "Form tidak valid: " + err.Error()
-	}
-
-	nama := strings.TrimSpace(r.FormValue("nama"))
-	if nama == "" {
-		return Resep{}, "Nama resep wajib diisi"
-	}
-
-	porsi, _ := strconv.Atoi(strings.TrimSpace(r.FormValue("porsi")))
-	if porsi < 1 {
-		porsi = 1
-	}
-
-	// bahan_id dan jumlah dikirim berurutan, satu pasang per baris
-	ids := r.Form["bahan_id"]
-	jml := r.Form["jumlah"]
-	var bahan []BahanResep
-	for i := range ids {
-		if i >= len(jml) {
-			break
-		}
-		id, err := strconv.Atoi(ids[i])
-		j := parseFloat(jml[i])
-		if err != nil || j <= 0 {
-			continue
-		}
-		bahan = append(bahan, BahanResep{BahanID: id, Jumlah: j})
-	}
-	if len(bahan) == 0 {
-		return Resep{}, "Resep harus punya minimal satu bahan dengan jumlah lebih dari 0"
-	}
-
-	return Resep{
-		Nama:      nama,
-		Deskripsi: strings.TrimSpace(r.FormValue("deskripsi")),
-		Porsi:     porsi,
-		Langkah:   strings.TrimSpace(r.FormValue("langkah")),
-		Bahan:     bahan,
-	}, ""
-}
-
-func tampilkanFormResep(w http.ResponseWriter, r *http.Request, data FormResep) {
-	daftar, err := dbSemuaBahan(r.Context())
-	if err != nil {
-		galat(w, "Gagal membaca data bahan", err)
-		return
-	}
-
-	// Jumlah bahan di resep dihitung dalam gram
-	for _, b := range daftar {
-		data.Opsi = append(data.Opsi, BahanOpsi{ID: b.ID, Label: b.NamaBahan})
-	}
-
-	renderResep(w, "form_resep.html", data)
-}
-
 // =========================
-// HANDLER
+// HANDLER (HANYA BACA)
 // =========================
 
 // Daftar resep: /resep
@@ -214,63 +150,35 @@ func resepListPage(w http.ResponseWriter, r *http.Request) {
 		galat(w, "Gagal membaca data bahan", err)
 		return
 	}
+	perResep, _, err := muatTautan(r)
+	if err != nil {
+		galat(w, "Gagal membaca menu resep", err)
+		return
+	}
 
 	peta := petaBahan(bahan)
 	views := make([]ResepView, 0, len(daftar))
 	for _, rs := range daftar {
-		views = append(views, hitungView(rs, peta))
+		v := hitungView(rs, peta)
+		if t, ada := perResep[rs.ID]; ada {
+			v.MenuID = t.MenuID
+			v.MenuNama = t.MenuNama
+		}
+		views = append(views, v)
 	}
 
 	renderResep(w, "resep.html", struct{ DaftarResep []ResepView }{views})
 }
 
-// Tambah resep: /resep/tambah
-func tambahResepPage(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		resep, pesan := bacaFormResep(r)
-		if pesan != "" {
-			http.Error(w, pesan, http.StatusBadRequest)
-			return
-		}
-		if err := dbTambahResep(r.Context(), resep); err != nil {
-			galat(w, "Gagal menyimpan resep", err)
-			return
-		}
-		http.Redirect(w, r, "/resep", http.StatusSeeOther)
-		return
-	}
-
-	tampilkanFormResep(w, r, FormResep{
-		Judul:  "Tambah Resep",
-		Action: "/resep/tambah",
-		Resep:  Resep{Porsi: 1},
-	})
-}
-
-// /resep/{id}  /resep/{id}/edit  /resep/{id}/hapus
+// /resep/{id}  (hanya detail; tidak ada edit atau hapus)
 func aksiResepPage(w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(strings.TrimPrefix(r.URL.Path, "/resep/"), "/")
-	bagian := strings.Split(path, "/")
-
-	id, err := strconv.Atoi(bagian[0])
-	if err != nil || len(bagian) > 2 {
+	id, err := strconv.Atoi(path)
+	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
-
-	if len(bagian) == 1 {
-		detailResep(w, r, id)
-		return
-	}
-
-	switch bagian[1] {
-	case "edit":
-		editResep(w, r, id)
-	case "hapus":
-		hapusResep(w, r, id)
-	default:
-		http.NotFound(w, r)
-	}
+	detailResep(w, r, id)
 }
 
 func detailResep(w http.ResponseWriter, r *http.Request, id int) {
@@ -291,59 +199,16 @@ func detailResep(w http.ResponseWriter, r *http.Request, id int) {
 		galat(w, "Gagal membaca data bahan", err)
 		return
 	}
-
-	renderResep(w, "detail_resep.html", hitungView(resep, petaBahan(bahan)))
-}
-
-func editResep(w http.ResponseWriter, r *http.Request, id int) {
-	if r.Method == http.MethodPost {
-		baru, pesan := bacaFormResep(r)
-		if pesan != "" {
-			http.Error(w, pesan, http.StatusBadRequest)
-			return
-		}
-		baru.ID = id
-
-		if err := dbUbahResep(r.Context(), baru); err != nil {
-			if tidakAda(err) {
-				http.NotFound(w, r)
-				return
-			}
-			galat(w, "Gagal menyimpan perubahan resep", err)
-			return
-		}
-
-		http.Redirect(w, r, "/resep", http.StatusSeeOther)
-		return
-	}
-
-	resep, err := dbResepByID(r.Context(), id)
+	perResep, _, err := muatTautan(r)
 	if err != nil {
-		if tidakAda(err) {
-			http.NotFound(w, r)
-			return
-		}
-		galat(w, "Gagal membaca resep", err)
+		galat(w, "Gagal membaca menu resep", err)
 		return
 	}
 
-	tampilkanFormResep(w, r, FormResep{
-		Judul:  "Edit Resep",
-		Action: fmt.Sprintf("/resep/%d/edit", id),
-		Resep:  resep,
-	})
-}
-
-func hapusResep(w http.ResponseWriter, r *http.Request, id int) {
-	if r.Method != http.MethodPost {
-		http.Redirect(w, r, "/resep", http.StatusSeeOther)
-		return
+	v := hitungView(resep, petaBahan(bahan))
+	if t, ada := perResep[id]; ada {
+		v.MenuID = t.MenuID
+		v.MenuNama = t.MenuNama
 	}
-
-	if err := dbHapusResep(r.Context(), id); err != nil {
-		galat(w, "Gagal menghapus resep", err)
-		return
-	}
-
-	http.Redirect(w, r, "/resep", http.StatusSeeOther)
+	renderResep(w, "detail_resep.html", v)
 }

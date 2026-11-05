@@ -51,17 +51,17 @@ func main() {
 	http.HandleFunc("/bahan/", requireLogin(aksiBahanPage)) // edit & hapus
 
 	// FITUR RESEP (resep.go)
+	// Resep dibuat oleh AI dan hanya dibaca di aplikasi ini (detail saja).
 	// Daftar resep sudah digabung ke halaman /menu.
 	http.HandleFunc("/resep", requireLogin(func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/menu", http.StatusSeeOther)
 	}))
-	http.HandleFunc("/resep/tambah", requireLogin(tambahResepPage))
-	http.HandleFunc("/resep/", requireLogin(aksiResepPage))
+	http.HandleFunc("/resep/", requireLogin(aksiResepPage)) // detail saja
 
 	// FITUR MENU (menu.go)
 	http.HandleFunc("/menu", requireLogin(menuListPage))
 	http.HandleFunc("/menu/tambah", requireLogin(tambahMenuPage))
-	http.HandleFunc("/menu/", requireLogin(aksiMenuPage))
+	http.HandleFunc("/menu/", requireLogin(aksiMenuPage)) // detail, edit & hapus
 
 	// FITUR MONITORING (monitoring.go)
 	http.HandleFunc("/monitoring", requireLogin(monitoringPage))

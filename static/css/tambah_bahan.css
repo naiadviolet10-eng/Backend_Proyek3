@@ -127,6 +127,73 @@ body {
     box-shadow: 0 0 0 3px rgba(61, 122, 85, 0.12);
 }
 
+/* ===== BARU: Unggah foto ===== */
+
+.upload-area {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.preview {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px dashed #cfdcd3;
+    border-radius: 14px;
+    background: #eef5f0;
+    font-size: 40px;
+}
+
+.preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-kontrol {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.upload-kontrol input[type="file"] {
+    font-size: 13px;
+    font-family: inherit;
+    color: #526159;
+}
+
+.upload-kontrol input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #e4eee8;
+    color: #315d42;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.upload-kontrol input[type="file"]::file-selector-button:hover {
+    background: #d3e6da;
+}
+
+.check-hapus {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #a63c3c;
+    cursor: pointer;
+}
+
+/* ===== Tombol ===== */
+
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -186,5 +253,10 @@ body {
 
     .span-2 {
         grid-column: span 1;
+    }
+
+    .upload-area {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
