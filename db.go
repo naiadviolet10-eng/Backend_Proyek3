@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -38,11 +37,4 @@ func initDB() error {
 // Data tidak ditemukan
 func tidakAda(err error) bool {
 	return errors.Is(err, pgx.ErrNoRows)
-}
-
-// Data masih dipakai tabel lain (pelanggaran foreign key, kode 23503).
-// Dipakai untuk bahan yang dipakai resep dan resep yang dipakai menu.
-func bahanDipakai(err error) bool {
-	var pgErr *pgconn.PgError
-	return errors.As(err, &pgErr) && pgErr.Code == "23503"
 }
