@@ -1,0 +1,96 @@
+
+package main
+
+// Data gizi suatu bahan atau resep.
+type Gizi struct {
+	Kalori      float64
+	Protein     float64
+	Lemak       float64
+	Karbohidrat float64
+	ZatBesi     float64
+	Seng        float64
+	VitaminA    float64
+	VitaminC    float64
+}
+
+// Data utama resep dari tabel resep.
+type Resep struct {
+	ID        int
+	Nama      string
+	Deskripsi string
+	Porsi     int
+	Langkah   string
+	Bahan     []BahanResep
+}
+
+// Bahan yang digunakan dalam suatu resep.
+type BahanResep struct {
+	BahanID int
+	Jumlah  float64
+}
+
+// Opsi resep untuk dropdown pada halaman menu.
+type BahanOpsi struct {
+	ID    int
+	Label string
+}
+
+// Resep beserta perkiraan kandungan gizi per porsi.
+type ResepView struct {
+	Resep
+	PerPorsi Gizi
+}
+
+// Membuat peta bahan berdasarkan ID bahan.
+func petaBahan(daftar []Bahan) map[int]Bahan {
+	hasil := make(map[int]Bahan, len(daftar))
+
+	for _, bahan := range daftar {
+		hasil[bahan.ID] = bahan
+	}
+
+	return hasil
+}
+
+// Menghitung perkiraan kandungan gizi satu resep.
+// Asumsi: jumlah bahan dalam resep dinyatakan dalam gram.
+func hitungView(resep Resep, bahanMap map[int]Bahan) ResepView {
+	hasil := ResepView{
+		Resep: resep,
+	}
+
+	var total Gizi
+
+	for _, item := range resep.Bahan {
+		bahan, ditemukan := bahanMap[item.BahanID]
+		if !ditemukan || item.Jumlah <= 0 {
+			continue
+		}
+
+		// Data gizi ingredients_master disimpan per 100 gram.
+		faktor := item.Jumlah / 100
+
+		total.Kalori += bahan.Kalori * faktor
+		total.Protein += bahan.Protein * faktor
+		total.Lemak += bahan.Lemak * faktor
+		total.Karbohidrat += bahan.Karbohidrat * faktor
+		total.ZatBesi += bahan.ZatBesi * faktor
+		total.Seng += bahan.Seng * faktor
+		total.VitaminA += bahan.VitaminA * faktor
+		total.VitaminC += bahan.VitaminC * faktor
+	}
+
+	if resep.Porsi > 0 {
+		total.Kalori /= float64(resep.Porsi)
+		total.Protein /= float64(resep.Porsi)
+		total.Lemak /= float64(resep.Porsi)
+		total.Karbohidrat /= float64(resep.Porsi)
+		total.ZatBesi /= float64(resep.Porsi)
+		total.Seng /= float64(resep.Porsi)
+		total.VitaminA /= float64(resep.Porsi)
+		total.VitaminC /= float64(resep.Porsi)
+	}
+
+	hasil.PerPorsi = total
+	return hasil
+}
