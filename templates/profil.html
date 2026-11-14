@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Saya - Dapur Cerdas</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/profil.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <a href="/dashboard" class="brand brand-link">
+            <img src="/static/img/logo_dapur_cerdas.png" alt="Logo Dapur Cerdas">
+            <div>
+                <h2>Dapur Cerdas</h2>
+            </div>
+        </a>
+
+        <div class="admin-profile">
+            <div class="notification">🔔</div>
+
+            <div class="profile-menu">
+                <button type="button" class="profile-trigger" id="profileTrigger"
+                        aria-haspopup="true" aria-expanded="false">
+                    <span class="avatar">{{.Inisial}}</span>
+                    <span>{{.Username}}</span>
+                    <span class="caret">▾</span>
+                </button>
+
+                <div class="dropdown" id="profileDropdown">
+                    <a href="/profil" class="dropdown-item">👤 Profil Saya</a>
+                    <a href="/logout" class="dropdown-item logout">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ISI HALAMAN -->
+    <main class="container">
+
+        <p class="small-title">AKUN</p>
+        <h1 class="page-title">Profil Saya</h1>
+
+        <section class="profile-card">
+
+            <div class="profile-top">
+                <div class="avatar avatar-big">{{.Inisial}}</div>
+
+                <div>
+                    <h2>{{.Username}}</h2>
+                    <span class="role-badge">Administrator</span>
+                </div>
+            </div>
+
+            <div class="profile-info">
+                <div class="info-row">
+                    <span>Username</span>
+                    <strong>{{.Username}}</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Peran</span>
+                    <strong>Administrator</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Status</span>
+                    <strong class="status-aktif">Sedang login</strong>
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <a href="/dashboard" class="btn-secondary">← Kembali ke Dashboard</a>
+                <a href="/logout" class="btn-logout">Logout</a>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 Dapur Cerdas — Copyright</p>
+    </footer>
+
+    <script>
+        const trigger = document.getElementById("profileTrigger");
+        const dropdown = document.getElementById("profileDropdown");
+
+        trigger.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const terbuka = dropdown.classList.toggle("show");
+            trigger.setAttribute("aria-expanded", terbuka);
+        });
+
+        document.addEventListener("click", function () {
+            dropdown.classList.remove("show");
+            trigger.setAttribute("aria-expanded", "false");
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") {
+                dropdown.classList.remove("show");
+                trigger.setAttribute("aria-expanded", "false");
+            }
+        });
+    </script>
+
+</body>
+</html>
