@@ -1,19 +1,27 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+<<<<<<< HEAD
+=======
+	_ = godotenv.Load()
+
+>>>>>>> origin/rizal
 	if err := initDB(); err != nil {
 		log.Fatal("Gagal konek ke database: ", err)
 	}
 	defer db.Close()
-
 	fmt.Println("Terhubung ke database")
 
+<<<<<<< HEAD
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	http.HandleFunc("/login", loginHandler)
@@ -61,6 +69,14 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{"message": "Backend Pangan Bijak berjalan", "status": "success"}`)
 	})
+=======
+	jalankanMigrasi(context.Background())
+
+	daftarkanAPI()
+
+	// Jalankan cron job untuk hapus bahan kadaluarsa
+	go jalankanCronJob()
+>>>>>>> origin/rizal
 
 	fmt.Println("Server berjalan di http://localhost:8080")
 	if err := http.ListenAndServe(":8080", enableCORS(http.DefaultServeMux)); err != nil {
