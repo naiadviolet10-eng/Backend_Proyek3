@@ -7,10 +7,6 @@ import (
 	"time"
 )
 
-// =========================
-// HALAMAN DASHBOARD
-// =========================
-
 func dashboardPage(w http.ResponseWriter, r *http.Request) {
 
 	loc, err := time.LoadLocation("Asia/Jakarta")
@@ -39,9 +35,11 @@ func dashboardPage(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Tanggal string
 		Waktu   string
+		Ringkasan
 	}{
-		Tanggal: fmt.Sprintf("%02d %s %d", now.Day(), bulanIndonesia[now.Month()], now.Year()),
-		Waktu:   now.Format("15:04:05"),
+		Tanggal:   fmt.Sprintf("%02d %s %d", now.Day(), bulanIndonesia[now.Month()], now.Year()),
+		Waktu:     now.Format("15:04:05"),
+		Ringkasan: dbRingkasan(r.Context()),
 	}
 
 	tmpl, err := template.ParseFiles("templates/dashboard.html")

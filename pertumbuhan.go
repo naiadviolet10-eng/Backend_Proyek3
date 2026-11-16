@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -15,9 +14,7 @@ import (
 	"time"
 )
 
-// =====================================================
 // STRUKTUR DATA
-// =====================================================
 
 type PermintaanAnalisisPertumbuhan struct {
 	ChildID           string  `json:"child_id"`
@@ -42,9 +39,7 @@ type indikatorPertumbuhan struct {
 	ZScore   *float64 `json:"z_score"`
 }
 
-// =====================================================
 // HANDLER ANALISIS PERTUMBUHAN
-// =====================================================
 
 func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -62,7 +57,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+	r.Body = http.MaxBytesReader(w, r.Body, maksBacaBody)
 	defer r.Body.Close()
 
 	var input PermintaanAnalisisPertumbuhan
@@ -86,9 +81,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// -------------------------------------------------
 	// VALIDASI TANGGAL
-	// -------------------------------------------------
 
 	tanggalLahir, err := time.Parse("2006-01-02", input.TanggalLahir)
 	if err != nil {
@@ -126,9 +119,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// -------------------------------------------------
 	// VALIDASI JENIS KELAMIN
-	// -------------------------------------------------
 
 	sex := strings.ToLower(strings.TrimSpace(input.JenisKelamin))
 
@@ -147,9 +138,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// -------------------------------------------------
 	// VALIDASI BERAT BADAN
-	// -------------------------------------------------
 
 	if !angkaValid(input.BeratKg) ||
 		input.BeratKg <= 0 ||
@@ -162,9 +151,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// -------------------------------------------------
 	// VALIDASI PANJANG / TINGGI BADAN
-	// -------------------------------------------------
 
 	if !angkaValid(input.PanjangTinggiCm) ||
 		input.PanjangTinggiCm <= 0 ||
@@ -177,9 +164,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// -------------------------------------------------
 	// VALIDASI LINGKAR KEPALA
-	// -------------------------------------------------
 
 	if !angkaValid(input.LingkarKepalaCm) ||
 		input.LingkarKepalaCm < 0 ||
@@ -192,9 +177,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// -------------------------------------------------
 	// POSISI PENGUKURAN
-	// -------------------------------------------------
 
 	measure := strings.ToLower(strings.TrimSpace(input.PosisiPengukuran))
 
@@ -237,9 +220,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// -------------------------------------------------
 	// SIAPKAN DATA UNTUK NODE.JS
-	// -------------------------------------------------
 
 	payload := map[string]interface{}{
 		"sex":     sex,
@@ -259,9 +240,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// -------------------------------------------------
 	// HITUNG Z-SCORE WHO
-	// -------------------------------------------------
 
 	hasilWHO, err := hitungZScoreWHO(payloadBytes)
 	if err != nil {
@@ -273,9 +252,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// -------------------------------------------------
 	// BENTUK HASIL INDIKATOR
-	// -------------------------------------------------
 
 	bbu := indikatorPertumbuhan{
 		Kategori: interpretasiZScore(hasilWHO.Zwei, "bb_u"),
@@ -303,9 +280,7 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 		hasilWHO.Zwei,
 	)
 
-	// -------------------------------------------------
 	// HASIL ANALISIS
-	// -------------------------------------------------
 
 	hasil := map[string]interface{}{
 		"bbu":        bbu,
@@ -357,17 +332,13 @@ func analisisPertumbuhanHandler(w http.ResponseWriter, r *http.Request) {
 	kirimJSONPertumbuhan(w, http.StatusOK, response)
 }
 
-// =====================================================
 // VALIDASI ANGKA
-// =====================================================
 
 func angkaValid(nilai float64) bool {
 	return !math.IsNaN(nilai) && !math.IsInf(nilai, 0)
 }
 
-// =====================================================
 // CARI FOLDER FRONTEND
-// =====================================================
 
 func cariFolderFrontend() (string, error) {
 	if folderEnv := strings.TrimSpace(os.Getenv("WHO_NODE_PROJECT_DIR")); folderEnv != "" {
@@ -425,9 +396,7 @@ func packageTersedia(folder string) bool {
 	return err == nil
 }
 
-// =====================================================
 // PERHITUNGAN Z-SCORE WHO MELALUI NODE.JS
-// =====================================================
 
 func hitungZScoreWHO(input []byte) (hasilMentahWHO, error) {
 	folderFrontend, err := cariFolderFrontend()
@@ -560,9 +529,7 @@ process.stdout.write(JSON.stringify(hasil));
 	return hasil, nil
 }
 
-// =====================================================
 // INTERPRETASI Z-SCORE
-// =====================================================
 
 func interpretasiZScore(nilai *float64, indikator string) string {
 	if nilai == nil || !angkaValid(*nilai) {
@@ -631,9 +598,7 @@ func interpretasiZScore(nilai *float64, indikator string) string {
 	return "Indikator berhasil dihitung."
 }
 
-// =====================================================
 // KESIMPULAN GABUNGAN
-// =====================================================
 
 func buatKesimpulan(
 	zPB_TB_U *float64,
@@ -705,9 +670,7 @@ func buatKesimpulan(
 	return "Pertumbuhan anak berada dalam rentang normal berdasarkan indikator WHO yang tersedia."
 }
 
-// =====================================================
 // RESPONSE JSON
-// =====================================================
 
 func kirimJSONPertumbuhan(
 	w http.ResponseWriter,

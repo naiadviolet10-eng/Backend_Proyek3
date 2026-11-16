@@ -35,7 +35,7 @@ func main() {
 	http.HandleFunc("/api/resep/tersimpan", resepTersimpanHandler)
 	http.HandleFunc("/api/resep/tersimpan/", hapusResepTersimpanHandler)
 
-	http.HandleFunc("/api/pertumbuhan/analisis", analisisPertumbuhanHandler)
+	http.HandleFunc("/api/pertumbuhan/analisis", wajibLoginAPI(analisisPertumbuhanHandler))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
@@ -52,15 +52,18 @@ func main() {
 	http.HandleFunc("/bahan/tambah", requireLogin(tambahBahanPage))
 	http.HandleFunc("/bahan/", requireLogin(aksiBahanPage))
 
+	// FITUR RESEP (resep.go)
+	// Daftar resep sudah digabung ke halaman /menu.
+	// /resep diarahkan ke /menu; detail, tambah, edit & hapus tetap tersedia.
 	http.HandleFunc("/resep", requireLogin(func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/menu", http.StatusSeeOther)
 	}))
 	http.HandleFunc("/resep/tambah", requireLogin(tambahResepPage))
-	http.HandleFunc("/resep/", requireLogin(aksiResepPage))
+	http.HandleFunc("/resep/", requireLogin(aksiResepPage)) // detail
 
 	http.HandleFunc("/menu", requireLogin(menuListPage))
 	http.HandleFunc("/menu/tambah", requireLogin(tambahMenuPage))
-	http.HandleFunc("/menu/", requireLogin(aksiMenuPage))
+	http.HandleFunc("/menu/", requireLogin(aksiMenuPage)) // detail, edit & hapus
 
 	http.HandleFunc("/monitoring", requireLogin(monitoringPage))
 

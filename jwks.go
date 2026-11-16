@@ -65,7 +65,7 @@ func (c *cacheJWKS) ambil(ctx context.Context) error {
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("endpoint JWKS membalas kode %d", resp.StatusCode)
 	}
-	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maksBacaBody))
 	if err != nil {
 		return err
 	}

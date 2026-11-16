@@ -503,9 +503,8 @@ func apiGenerateResep(w http.ResponseWriter, r *http.Request) {
 		perNama = pn
 	}
 	rt := resepTersimpan{ID: id, Nama: nama, Deskripsi: deskripsi, Waktu: waktu, Porsi: porsi, Langkah: langkah, Bahan: bahan}
-	kirimJSON(w, http.StatusCreated, map[string]any{
-		"success": true, "message": "Resep berhasil dibuat", "data": resepDariTersimpan(rt, perNama, map[int64]bool{}),
-	})
+	kirimDataPesan(w, http.StatusCreated, "Resep berhasil dibuat",
+		resepDariTersimpan(rt, perNama, map[int64]bool{}))
 }
 
 // normalBahanAI membuang bahan tanpa nama dan memastikan jumlah positif.

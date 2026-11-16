@@ -80,11 +80,11 @@ func hapusBahanKadaluarsa() error {
 
 	// Ambil bahan yang akan dihapus
 	rows, err := db.Query(context.Background(), `
-		SELECT s.id::text, s.user_id::text, i.nama, s.expired_date::text
-		FROM ingredients_stock s
-		JOIN ingredients i ON i.id = s.ingredient_id
-		WHERE s.expired_date IS NOT NULL 
-		  AND s.expired_date < $1::date
+		SELECT s.id::text, s.user_id::text, i.name, s.tanggal_kadaluarsa::text
+		FROM stok s
+		JOIN ingredients_master i ON i.id = s.bahan_pangan_id
+		WHERE s.tanggal_kadaluarsa IS NOT NULL 
+		  AND s.tanggal_kadaluarsa < $1::date
 	`, cutoff)
 	if err != nil {
 		return err
@@ -92,10 +92,10 @@ func hapusBahanKadaluarsa() error {
 	defer rows.Close()
 
 	type stokHapus struct {
-		id         string
-		userID     string
-		namaBahan  string
-		expiredAt  string
+		id        string
+		userID    string
+		namaBahan string
+		expiredAt string
 	}
 	var toDelete []stokHapus
 	for rows.Next() {
@@ -109,7 +109,7 @@ func hapusBahanKadaluarsa() error {
 	// Hapus dan buat notifikasi
 	for _, s := range toDelete {
 		_, err := db.Exec(context.Background(), `
-			DELETE FROM ingredients_stock WHERE id = $1
+			DELETE FROM stok WHERE id = $1
 		`, s.id)
 		if err != nil {
 			continue

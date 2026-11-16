@@ -16,9 +16,15 @@ func kirimJSON(w http.ResponseWriter, status int, isi any) {
 }
 
 func kirimData(w http.ResponseWriter, data any) {
-	kirimJSON(w, http.StatusOK, map[string]any{
+	kirimDataPesan(w, http.StatusOK, "OK", data)
+}
+
+// kirimDataPesan membalas sukses dengan pesan khusus beserta data,
+// mis. "Stok berhasil ditambahkan".
+func kirimDataPesan(w http.ResponseWriter, status int, pesan string, data any) {
+	kirimJSON(w, status, map[string]any{
 		"success": true,
-		"message": "OK",
+		"message": pesan,
 		"data":    data,
 	})
 }
@@ -51,6 +57,10 @@ func kirimValidasi(w http.ResponseWriter, pesan string, field string, rincian st
 		"errors":  map[string][]string{field: {rincian}},
 	})
 }
+
+// maksBacaBody membatasi byte yang dibaca dari body permintaan maupun
+// respons luar supaya respons raksasa tidak menghabiskan memori.
+const maksBacaBody = 1 << 20
 
 // bacaJSON mengabaikan field yang tidak dikenal, sama seperti validasi Laravel,
 // supaya perubahan di aplikasi tidak langsung mematahkan permintaan.

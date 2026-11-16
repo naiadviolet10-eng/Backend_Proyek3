@@ -5,9 +5,7 @@ import (
 	"net/http"
 )
 
-// =========================
 // HALAMAN MONITORING
-// =========================
 
 func monitoringPage(w http.ResponseWriter, r *http.Request) {
 

@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -66,12 +65,12 @@ func resepTersimpanHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		jsonResponse(w, http.StatusOK, map[string]any{
+		kirimJSON(w, http.StatusOK, map[string]any{
 			"items": items,
 		})
 
 	case http.MethodPost:
-		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+		r.Body = http.MaxBytesReader(w, r.Body, maksBacaBody)
 
 		var input struct {
 			NamaResep string          `json:"nama_resep"`
@@ -120,7 +119,7 @@ func resepTersimpanHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		jsonResponse(w, http.StatusCreated, map[string]any{
+		kirimJSON(w, http.StatusCreated, map[string]any{
 			"message": "Resep berhasil disimpan",
 			"item":    item,
 		})
@@ -174,7 +173,7 @@ func hapusResepTersimpanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonResponse(w, http.StatusOK, map[string]any{
+	kirimJSON(w, http.StatusOK, map[string]any{
 		"message": "Resep berhasil dihapus",
 	})
 }

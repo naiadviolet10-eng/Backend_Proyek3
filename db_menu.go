@@ -6,11 +6,45 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func dbSemuaMenu(ctx context.Context) ([]Menu, error) {
+// Resep AI yang menempel ke sebuah menu
+type ResepTaut struct {
+	ResepID  int
+	Nama     string
+	MenuID   int
+	MenuNama string
+}
+
+// Jumlah menu per kelompok, untuk empat kartu filter
+func dbHitungMenu(ctx context.Context) (map[string]int, error) {
+	rows, err := db.Query(ctx, `SELECT kelompok, COUNT(*) FROM menu GROUP BY kelompok`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	hasil := make(map[string]int, len(daftarKelompok))
+	for _, k := range daftarKelompok {
+		hasil[k] = 0
+	}
+	for rows.Next() {
+		var k string
+		var n int
+		if err := rows.Scan(&k, &n); err != nil {
+			return nil, err
+		}
+		hasil[k] = n
+	}
+	return hasil, rows.Err()
+}
+
+// Daftar menu. kelompok kosong = semua kelompok.
+func dbSemuaMenu(ctx context.Context, kelompok string) ([]Menu, error) {
 	rows, err := db.Query(ctx, `
-		SELECT id, nama, COALESCE(deskripsi,''),
-		       COALESCE(to_char(tanggal,'YYYY-MM-DD'),''), COALESCE(waktu_makan,'')
-		FROM menu ORDER BY tanggal DESC NULLS LAST, id DESC`)
+		SELECT id, nama, COALESCE(deskripsi,''), kelompok,
+		       COALESCE(sasaran_detail,''), porsi
+		FROM menu
+		WHERE ($1::text = '' OR kelompok = $1::text)
+		ORDER BY nama`, kelompok)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +53,7 @@ func dbSemuaMenu(ctx context.Context) ([]Menu, error) {
 	posisi := map[int]int{}
 	for rows.Next() {
 		var m Menu
-		if err := rows.Scan(&m.ID, &m.Nama, &m.Deskripsi, &m.Tanggal, &m.WaktuMakan); err != nil {
+		if err := rows.Scan(&m.ID, &m.Nama, &m.Deskripsi, &m.Kelompok, &m.SasaranDetail, &m.Porsi); err != nil {
 			rows.Close()
 			return nil, err
 		}
@@ -31,57 +65,63 @@ func dbSemuaMenu(ctx context.Context) ([]Menu, error) {
 		return nil, err
 	}
 
-	mr, err := db.Query(ctx, `SELECT menu_id, resep_id, porsi FROM menu_resep ORDER BY id`)
+	// bahan dari semua menu yang termasuk filter, diambil sekaligus
+	mb, err := db.Query(ctx, `
+		SELECT mb.menu_id, mb.bahan_id, mb.jumlah
+		FROM menu_bahan mb
+		JOIN menu m ON m.id = mb.menu_id
+		WHERE ($1::text = '' OR m.kelompok = $1::text)
+		ORDER BY mb.id`, kelompok)
 	if err != nil {
 		return nil, err
 	}
-	defer mr.Close()
+	defer mb.Close()
 
-	for mr.Next() {
-		var mid int
-		var rm ResepMenu
-		if err := mr.Scan(&mid, &rm.ResepID, &rm.Porsi); err != nil {
+	for mb.Next() {
+		var menuID int
+		var bm BahanMenu
+		if err := mb.Scan(&menuID, &bm.BahanID, &bm.Jumlah); err != nil {
 			return nil, err
 		}
-		if i, ok := posisi[mid]; ok {
-			hasil[i].Resep = append(hasil[i].Resep, rm)
+		if i, ok := posisi[menuID]; ok {
+			hasil[i].Isi = append(hasil[i].Isi, bm)
 		}
 	}
-	return hasil, mr.Err()
+	return hasil, mb.Err()
 }
 
 func dbMenuByID(ctx context.Context, id int) (Menu, error) {
 	var m Menu
 	err := db.QueryRow(ctx, `
-		SELECT id, nama, COALESCE(deskripsi,''),
-		       COALESCE(to_char(tanggal,'YYYY-MM-DD'),''), COALESCE(waktu_makan,'')
+		SELECT id, nama, COALESCE(deskripsi,''), kelompok,
+		       COALESCE(sasaran_detail,''), porsi
 		FROM menu WHERE id=$1`, id).
-		Scan(&m.ID, &m.Nama, &m.Deskripsi, &m.Tanggal, &m.WaktuMakan)
+		Scan(&m.ID, &m.Nama, &m.Deskripsi, &m.Kelompok, &m.SasaranDetail, &m.Porsi)
 	if err != nil {
 		return m, err
 	}
 
-	rows, err := db.Query(ctx, `SELECT resep_id, porsi FROM menu_resep WHERE menu_id=$1 ORDER BY id`, id)
+	rows, err := db.Query(ctx, `SELECT bahan_id, jumlah FROM menu_bahan WHERE menu_id=$1 ORDER BY id`, id)
 	if err != nil {
 		return m, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var rm ResepMenu
-		if err := rows.Scan(&rm.ResepID, &rm.Porsi); err != nil {
+		var bm BahanMenu
+		if err := rows.Scan(&bm.BahanID, &bm.Jumlah); err != nil {
 			return m, err
 		}
-		m.Resep = append(m.Resep, rm)
+		m.Isi = append(m.Isi, bm)
 	}
 	return m, rows.Err()
 }
 
-func sisipResepMenu(ctx context.Context, tx pgx.Tx, menuID int, resep []ResepMenu) error {
-	for _, r := range resep {
+func sisipBahanMenu(ctx context.Context, tx pgx.Tx, menuID int, isi []BahanMenu) error {
+	for _, b := range isi {
 		if _, err := tx.Exec(ctx,
-			`INSERT INTO menu_resep (menu_id, resep_id, porsi) VALUES ($1,$2,$3)`,
-			menuID, r.ResepID, r.Porsi); err != nil {
+			`INSERT INTO menu_bahan (menu_id, bahan_id, jumlah) VALUES ($1,$2,$3)`,
+			menuID, b.BahanID, b.Jumlah); err != nil {
 			return err
 		}
 	}
@@ -97,13 +137,13 @@ func dbTambahMenu(ctx context.Context, m Menu) error {
 
 	var id int
 	err = tx.QueryRow(ctx, `
-		INSERT INTO menu (nama, deskripsi, tanggal, waktu_makan)
-		VALUES ($1,$2,NULLIF($3,'')::date,$4) RETURNING id`,
-		m.Nama, m.Deskripsi, m.Tanggal, m.WaktuMakan).Scan(&id)
+		INSERT INTO menu (nama, deskripsi, kelompok, sasaran_detail, porsi)
+		VALUES ($1,$2,$3,NULLIF($4,''),$5) RETURNING id`,
+		m.Nama, m.Deskripsi, m.Kelompok, m.SasaranDetail, m.Porsi).Scan(&id)
 	if err != nil {
 		return err
 	}
-	if err := sisipResepMenu(ctx, tx, id, m.Resep); err != nil {
+	if err := sisipBahanMenu(ctx, tx, id, m.Isi); err != nil {
 		return err
 	}
 	return tx.Commit(ctx)
@@ -117,8 +157,10 @@ func dbUbahMenu(ctx context.Context, m Menu) error {
 	defer tx.Rollback(ctx)
 
 	tag, err := tx.Exec(ctx, `
-		UPDATE menu SET nama=$1, deskripsi=$2, tanggal=NULLIF($3,'')::date, waktu_makan=$4
-		WHERE id=$5`, m.Nama, m.Deskripsi, m.Tanggal, m.WaktuMakan, m.ID)
+		UPDATE menu
+		SET nama=$1, deskripsi=$2, kelompok=$3, sasaran_detail=NULLIF($4,''), porsi=$5
+		WHERE id=$6`,
+		m.Nama, m.Deskripsi, m.Kelompok, m.SasaranDetail, m.Porsi, m.ID)
 	if err != nil {
 		return err
 	}
@@ -126,16 +168,41 @@ func dbUbahMenu(ctx context.Context, m Menu) error {
 		return pgx.ErrNoRows
 	}
 
-	if _, err := tx.Exec(ctx, `DELETE FROM menu_resep WHERE menu_id=$1`, m.ID); err != nil {
+	if _, err := tx.Exec(ctx, `DELETE FROM menu_bahan WHERE menu_id=$1`, m.ID); err != nil {
 		return err
 	}
-	if err := sisipResepMenu(ctx, tx, m.ID, m.Resep); err != nil {
+	if err := sisipBahanMenu(ctx, tx, m.ID, m.Isi); err != nil {
 		return err
 	}
 	return tx.Commit(ctx)
 }
 
 func dbHapusMenu(ctx context.Context, id int) error {
+	// menu_bahan ikut terhapus (ON DELETE CASCADE),
+	// resep AI tetap ada dan menu_id-nya menjadi NULL (ON DELETE SET NULL)
 	_, err := db.Exec(ctx, `DELETE FROM menu WHERE id=$1`, id)
 	return err
+}
+
+// Semua resep yang sudah menempel ke sebuah menu (dibuat AI, hanya dibaca)
+func dbResepTaut(ctx context.Context) ([]ResepTaut, error) {
+	rows, err := db.Query(ctx, `
+		SELECT r.id, r.nama, r.menu_id, m.nama
+		FROM resep r
+		JOIN menu m ON m.id = r.menu_id
+		ORDER BY r.nama`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var hasil []ResepTaut
+	for rows.Next() {
+		var t ResepTaut
+		if err := rows.Scan(&t.ResepID, &t.Nama, &t.MenuID, &t.MenuNama); err != nil {
+			return nil, err
+		}
+		hasil = append(hasil, t)
+	}
+	return hasil, rows.Err()
 }

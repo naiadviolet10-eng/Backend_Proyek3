@@ -1,31 +1,35 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/gorilla/sessions"
+	_ "github.com/joho/godotenv/autoload"
 	"golang.org/x/crypto/bcrypt"
 )
-// =====================================================
-// UBAH DI SINI kalau mau ganti username dan password
-// (username harus huruf kecil semua)
-// =====================================================
-const (
-	loginUsername = "admindapurcerdas"
-	loginPassword = "Admin123"
-)
+
+// Kredensial admin dibaca dari environment lewat .env (godotenv/autoload):
+// ADMIN_USERNAME dan ADMIN_PASSWORD. Tidak ada fallback ke nilai hardcoded
+// supaya rahasia tidak pernah masuk ke riwayat versi.
+func kredensialAdmin() (username, password string) {
+	username = strings.ToLower(strings.TrimSpace(os.Getenv("ADMIN_USERNAME")))
+	password = os.Getenv("ADMIN_PASSWORD")
+	if username == "" || password == "" {
+		log.Fatal("ADMIN_USERNAME atau ADMIN_PASSWORD belum di-set di .env")
+	}
+	return username, password
+}
 
 // Kalau SESSION_KEY belum diset di terminal, pakai kunci sementara ini
 // supaya session tetap bisa tersimpan (untuk belajar/testing saja).
 func ambilSessionKey() []byte {
 	key := os.Getenv("SESSION_KEY")
 	if key == "" {
-		fmt.Println("PERINGATAN: SESSION_KEY kosong, memakai kunci sementara")
+		log.Print("PERINGATAN: SESSION_KEY kosong, memakai kunci sementara")
 		key = "kunci-sementara-dapur-cerdas-1234567890"
 	}
 	return []byte(key)
@@ -34,15 +38,17 @@ func ambilSessionKey() []byte {
 var store = sessions.NewCookieStore(ambilSessionKey())
 
 // Daftar user: username -> hash bcrypt.
-// Hash dibuat otomatis dari loginPassword saat program dijalankan.
+// Hash dibuat otomatis dari ADMIN_PASSWORD saat program dijalankan.
 var users = map[string]string{}
 
 func init() {
-	h, err := bcrypt.GenerateFromPassword([]byte(loginPassword), bcrypt.DefaultCost)
+	username, password := kredensialAdmin()
+
+	h, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		panic(err)
 	}
-	users[loginUsername] = string(h)
+	users[username] = string(h)
 
 	store.Options = &sessions.Options{
 		Path:     "/",
@@ -68,15 +74,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	// Spasi di awal/akhir dibuang, huruf besar/kecil username diabaikan
 	username := strings.ToLower(strings.TrimSpace(r.FormValue("email")))
 	password := r.FormValue("password")
-	fmt.Printf("DEBUG: form diterima, user=%q\n", username)
 
 	hash, ok := users[username]
-	if !ok {
-		fmt.Println("DEBUG: user tidak ditemukan:", username)
-	}
-
 	if !ok || bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) != nil {
-		fmt.Println("DEBUG: login gagal (user/password salah)")
+		log.Printf("login gagal untuk user %q", username)
 		tmpl.Execute(w, map[string]string{
 			"Error": "Username atau password salah",
 			"Email": username,
@@ -87,12 +88,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	sess, _ := store.Get(r, "session")
 	sess.Values["username"] = username
 	if err := sess.Save(r, w); err != nil {
-		fmt.Println("DEBUG: gagal simpan session:", err)
+		log.Printf("gagal menyimpan session: %v", err)
 		http.Error(w, "Gagal menyimpan session: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Println("DEBUG: login berhasil, redirect ke /dashboard")
 	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 }
 
@@ -108,7 +108,6 @@ func requireLogin(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sess, _ := store.Get(r, "session")
 		if sess.Values["username"] == nil {
-			fmt.Println("DEBUG: belum login, dialihkan ke /login dari", r.URL.Path)
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}

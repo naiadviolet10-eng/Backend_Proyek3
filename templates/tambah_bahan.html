@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Judul}} - Dapur Cerdas</title>
-    <link rel="stylesheet" href="/static/css/tambah_bahan.css">
+    <link rel="stylesheet" href="/static/css/tambah_bahan.css?v=2">
 </head>
 <body>
 
@@ -21,7 +21,8 @@
     </header>
 
     <main class="container">
-        <form method="POST" action="{{.Action}}">
+        <!-- BARU: enctype wajib supaya file foto ikut terkirim -->
+        <form method="POST" action="{{.Action}}" enctype="multipart/form-data">
 
             <!-- INFO DASAR -->
             <section class="form-card">
@@ -49,6 +50,33 @@
                         <input type="text" id="satuan" name="satuan"
                                value="{{.Bahan.Satuan}}"
                                placeholder="butir, sdm, potong" maxlength="20" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BARU: FOTO BAHAN -->
+            <section class="form-card">
+                <h3>Foto Bahan <span class="hint">opsional · JPG, PNG, WEBP, GIF · maks. 2 MB</span></h3>
+
+                <div class="upload-area">
+                    <div class="preview" id="preview">
+                        {{if .Bahan.Gambar}}
+                        <img src="{{.Bahan.Gambar}}" alt="Foto {{.Bahan.NamaBahan}}">
+                        {{else}}
+                        <span>🌿</span>
+                        {{end}}
+                    </div>
+
+                    <div class="upload-kontrol">
+                        <input type="file" id="gambar" name="gambar"
+                               accept="image/png,image/jpeg,image/webp,image/gif">
+
+                        {{if .Bahan.Gambar}}
+                        <label class="check-hapus">
+                            <input type="checkbox" name="hapus_gambar" value="1">
+                            Hapus foto saat ini
+                        </label>
+                        {{end}}
                     </div>
                 </div>
             </section>
@@ -114,6 +142,28 @@
 
         </form>
     </main>
+
+    <!-- BARU: pratinjau foto sebelum disimpan -->
+    <script>
+        const inputGambar = document.getElementById('gambar');
+        const preview = document.getElementById('preview');
+
+        inputGambar.addEventListener('change', function () {
+            const file = inputGambar.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Ukuran gambar maksimal 2 MB');
+                inputGambar.value = '';
+                return;
+            }
+
+            preview.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            preview.appendChild(img);
+        });
+    </script>
 
 </body>
 </html>

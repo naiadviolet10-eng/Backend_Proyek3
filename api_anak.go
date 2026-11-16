@@ -159,9 +159,7 @@ func apiTambahAnak(w http.ResponseWriter, r *http.Request) {
 	if hari != nil {
 		a = anakDariLengkap(a, *hari)
 	}
-	kirimJSON(w, http.StatusCreated, map[string]any{
-		"success": true, "message": "Profil anak berhasil ditambahkan", "data": a,
-	})
+	kirimDataPesan(w, http.StatusCreated, "Profil anak berhasil ditambahkan", a)
 }
 
 // GET /api/children/{id}
@@ -268,9 +266,7 @@ func apiUbahAnak(w http.ResponseWriter, r *http.Request) {
 	if hari != nil {
 		a = anakDariLengkap(a, *hari)
 	}
-	kirimJSON(w, http.StatusOK, map[string]any{
-		"success": true, "message": "Profil anak berhasil diperbarui", "data": a,
-	})
+	kirimDataPesan(w, http.StatusOK, "Profil anak berhasil diperbarui", a)
 }
 
 // DELETE /api/children/{id}
@@ -378,9 +374,7 @@ func apiTambahPengukuran(w http.ResponseWriter, r *http.Request) {
 		kirimPesan(w, http.StatusInternalServerError, "Gagal menyimpan pengukuran")
 		return
 	}
-	kirimJSON(w, http.StatusCreated, map[string]any{
-		"success": true, "message": "Data pengukuran ditambahkan", "data": p,
-	})
+	kirimDataPesan(w, http.StatusCreated, "Data pengukuran ditambahkan", p)
 }
 
 // validasiAnak memvalidasi nama, jenis kelamin, tanggal lahir, dan rentang HPHT

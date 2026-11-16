@@ -4,7 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bahan Pangan - Dapur Cerdas</title>
-    <link rel="stylesheet" href="/static/css/bahan_pangan.css?v=5">
+    <link rel="stylesheet" href="/static/css/bahan_pangan.css?v=9">
+
+    <!-- 5 kolom kartu: ditaruh langsung di sini supaya tidak bergantung cache file CSS -->
+    <style>
+        .container { max-width: 1600px !important; }
+
+        .grid-kartu {
+            grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+            gap: 14px !important;
+        }
+
+        .foto { height: 120px !important; }
+        .kartu-isi { padding: 12px 12px 4px !important; }
+        .kartu-isi h3 { font-size: 14px !important; overflow-wrap: anywhere; }
+        .kalori-utama strong { font-size: 21px !important; }
+        .makro span { font-size: 9px !important; }
+        .makro b { font-size: 11px !important; }
+        .badge-kat { font-size: 9px !important; padding: 3px 7px !important; }
+        .kartu-aksi { padding: 8px 12px 12px !important; }
+        .kartu-aksi .btn-edit,
+        .kartu-aksi .btn-hapus { font-size: 11px !important; padding: 6px 4px !important; }
+
+        @media (max-width: 700px) {
+            .grid-kartu { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        }
+        @media (max-width: 420px) {
+            .grid-kartu { grid-template-columns: 1fr !important; }
+        }
+    </style>
 </head>
 <body>
 
@@ -29,120 +57,279 @@
                 <p class="note">Semua nilai gizi dinyatakan per 100 gram.</p>
             </div>
 
-            <a href="/bahan/tambah" class="add-button">
-                + Tambah Bahan
-            </a>
+            <a href="/bahan/tambah" class="add-button">+ Tambah Bahan</a>
         </section>
 
-        <section class="filter-section">
-            <div class="search-box">
-                <input type="text" id="cari-bahan" placeholder="Cari nama bahan...">
+        <!-- Toolbar: cari, tampilan, kategori -->
+        <section class="toolbar">
+            <div class="toolbar-atas">
+                <div class="cari-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="7"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" id="cari-bahan" placeholder="Cari nama bahan...">
+                </div>
+
+                <div class="view-toggle" role="group" aria-label="Pilih tampilan">
+                    <button type="button" data-view="kartu" class="aktif">▦ Kartu</button>
+                    <button type="button" data-view="tabel">☰ Tabel</button>
+                </div>
             </div>
-            <select id="filter-kategori">
-                <option value="">Semua Kategori</option>
-            </select>
+
+            <div class="chips" id="chips"></div>
+
+            <p class="jumlah-data" id="jumlah-data"></p>
         </section>
-        <p class="jumlah-data" id="jumlah-data"></p>
 
-        <section class="table-card">
-            <table>
-                <thead>
-                    <tr>
-                        <th rowspan="2">No</th>
-                        <th rowspan="2">Nama Bahan</th>
-                        <th rowspan="2">Kategori</th>
-                        <th rowspan="2">Satuan</th>
-                        <th colspan="4" class="group group-makro">Makronutrien (per 100 g)</th>
-                        <th colspan="4" class="group group-mikro">Mineral &amp; Vitamin (per 100 g)</th>
-                        <th rowspan="2">Aksi</th>
-                    </tr>
-                    <tr>
-                        <th>Kalori<small>(kkal)</small></th>
-                        <th>Protein<small>(g)</small></th>
-                        <th>Lemak<small>(g)</small></th>
-                        <th>Karbohidrat<small>(g)</small></th>
+        <div id="wadah" data-view="kartu">
 
-                        <th>Zat Besi<small>(mg)</small></th>
-                        <th>Seng<small>(mg)</small></th>
-                        <th>Vitamin A<small>(mcg)</small></th>
-                        <th>Vitamin C<small>(mg)</small></th>
-                    </tr>
-                </thead>
+            <!-- ===== TAMPILAN KARTU ===== -->
+            <section class="view-kartu">
+                <div class="grid-kartu">
+                    {{range $b := .DaftarBahan}}
+                    <article class="kartu item" data-nama="{{$b.NamaBahan}}" data-kategori="{{$b.Kategori}}">
 
-                <tbody id="isi-tabel">
-                    {{range $i, $b := .DaftarBahan}}
-                    <tr class="baris-data" data-nama="{{$b.NamaBahan}}" data-kategori="{{$b.Kategori}}">
-                        <td class="no">{{inc $i}}</td>
-                        <td>{{$b.NamaBahan}}</td>
-                        <td>{{$b.Kategori}}</td>
-                        <td>{{$b.Satuan}}</td>
-                        <td>{{$b.Kalori}}</td>
-                        <td>{{$b.Protein}}</td>
-                        <td>{{$b.Lemak}}</td>
-                        <td>{{$b.Karbohidrat}}</td>
-                        <td>{{$b.ZatBesi}}</td>
-                        <td>{{$b.Seng}}</td>
-                        <td>{{$b.VitaminA}}</td>
-                        <td>{{$b.VitaminC}}</td>
-                        <td>
+                        <div class="foto">
+                            {{if $b.Gambar}}
+                            <img src="{{$b.Gambar}}" alt="{{$b.NamaBahan}}" loading="lazy">
+                            {{else}}
+                            <span class="foto-kosong" data-kat="{{$b.Kategori}}">🌿</span>
+                            {{end}}
+                            {{if $b.Kategori}}<span class="badge-kat">{{$b.Kategori}}</span>{{end}}
+                        </div>
+
+                        <div class="kartu-isi">
+                            <h3>{{$b.NamaBahan}}</h3>
+                            <p class="satuan">Satuan: {{$b.Satuan}}</p>
+
+                            <div class="kalori-utama">
+                                <strong>{{$b.Kalori}}</strong>
+                                <span>kkal</span>
+                            </div>
+
+                            <div class="makro">
+                                <div class="m-protein"><span>Protein</span><b>{{$b.Protein}} g</b></div>
+                                <div class="m-lemak"><span>Lemak</span><b>{{$b.Lemak}} g</b></div>
+                                <div class="m-karbo"><span>Karbo</span><b>{{$b.Karbohidrat}} g</b></div>
+                            </div>
+
+                            <details class="mikro">
+                                <summary>Mineral &amp; vitamin</summary>
+                                <ul>
+                                    <li><span>Zat Besi</span><b>{{$b.ZatBesi}} mg</b></li>
+                                    <li><span>Seng</span><b>{{$b.Seng}} mg</b></li>
+                                    <li><span>Vitamin A</span><b>{{$b.VitaminA}} mcg</b></li>
+                                    <li><span>Vitamin C</span><b>{{$b.VitaminC}} mg</b></li>
+                                </ul>
+                            </details>
+                        </div>
+
+                        <div class="kartu-aksi">
                             <a href="/bahan/{{$b.ID}}/edit" class="btn-edit">Edit</a>
                             <form action="/bahan/{{$b.ID}}/hapus" method="POST" class="form-hapus"
-                                onsubmit="return confirm('Yakin ingin menghapus bahan ini?')">
+                                  onsubmit="return confirm('Yakin ingin menghapus bahan ini?')">
                                 <button type="submit" class="btn-hapus">Hapus</button>
                             </form>
-                        </td>
-                    </tr>
-                    {{else}}
-                    <tr>
-                        <td colspan="13" class="empty">
-                            Belum ada data bahan pangan.
-                        </td>
-                    </tr>
+                        </div>
+
+                    </article>
                     {{end}}
-                </tbody>
-            </table>
-        </section>
+                </div>
+            </section>
+
+            <!-- ===== TAMPILAN TABEL ===== -->
+            <section class="view-tabel table-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2">No</th>
+                            <th rowspan="2">Nama Bahan</th>
+                            <th rowspan="2">Kategori</th>
+                            <th rowspan="2">Satuan</th>
+                            <th colspan="4" class="group group-makro">Makronutrien (per 100 g)</th>
+                            <th colspan="4" class="group group-mikro">Mineral &amp; Vitamin (per 100 g)</th>
+                            <th rowspan="2">Aksi</th>
+                        </tr>
+                        <tr>
+                            <th>Kalori<small>(kkal)</small></th>
+                            <th>Protein<small>(g)</small></th>
+                            <th>Lemak<small>(g)</small></th>
+                            <th>Karbohidrat<small>(g)</small></th>
+                            <th>Zat Besi<small>(mg)</small></th>
+                            <th>Seng<small>(mg)</small></th>
+                            <th>Vitamin A<small>(mcg)</small></th>
+                            <th>Vitamin C<small>(mg)</small></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range $b := .DaftarBahan}}
+                        <tr class="item" data-nama="{{$b.NamaBahan}}" data-kategori="{{$b.Kategori}}">
+                            <td class="no"></td>
+                            <td>
+                                <div class="nama-cell">
+                                    {{if $b.Gambar}}
+                                    <img src="{{$b.Gambar}}" alt="{{$b.NamaBahan}}" class="thumb" loading="lazy">
+                                    {{else}}
+                                    <span class="thumb kosong" data-kat="{{$b.Kategori}}">🌿</span>
+                                    {{end}}
+                                    <span>{{$b.NamaBahan}}</span>
+                                </div>
+                            </td>
+                            <td>{{$b.Kategori}}</td>
+                            <td>{{$b.Satuan}}</td>
+                            <td>{{$b.Kalori}}</td>
+                            <td>{{$b.Protein}}</td>
+                            <td>{{$b.Lemak}}</td>
+                            <td>{{$b.Karbohidrat}}</td>
+                            <td>{{$b.ZatBesi}}</td>
+                            <td>{{$b.Seng}}</td>
+                            <td>{{$b.VitaminA}}</td>
+                            <td>{{$b.VitaminC}}</td>
+                            <td>
+                                <a href="/bahan/{{$b.ID}}/edit" class="btn-edit">Edit</a>
+                                <form action="/bahan/{{$b.ID}}/hapus" method="POST" class="form-hapus"
+                                      onsubmit="return confirm('Yakin ingin menghapus bahan ini?')">
+                                    <button type="submit" class="btn-hapus">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </section>
+
+        </div>
+
+        <!-- Pesan kosong -->
+        <div class="kosong-pesan" id="pesan-kosong" hidden>
+            <div class="kosong-ikon">🔍</div>
+            <strong>Bahan tidak ditemukan</strong>
+            <p>Coba kata kunci lain atau pilih kategori yang berbeda.</p>
+        </div>
+
+        {{if not .DaftarBahan}}
+        <div class="kosong-pesan">
+            <div class="kosong-ikon">🌿</div>
+            <strong>Belum ada data bahan pangan</strong>
+            <p>Klik "+ Tambah Bahan" untuk mulai menambahkan.</p>
+        </div>
+        {{end}}
 
     </main>
 
     <script>
+        const wadah = document.getElementById('wadah');
         const kotakCari = document.getElementById('cari-bahan');
-        const pilihKategori = document.getElementById('filter-kategori');
+        const boxChips = document.getElementById('chips');
         const info = document.getElementById('jumlah-data');
-        const baris = Array.from(document.querySelectorAll('#isi-tabel .baris-data'));
+        const pesanKosong = document.getElementById('pesan-kosong');
 
-        Array.from(new Set(baris.map(b => b.dataset.kategori).filter(Boolean)))
-            .sort()
-            .forEach(function (k) {
-                const o = document.createElement('option');
-                o.value = k;
-                o.textContent = k;
-                pilihKategori.appendChild(o);
+        const kartu = Array.from(document.querySelectorAll('.kartu.item'));
+        const baris = Array.from(document.querySelectorAll('tr.item'));
+        const semua = kartu.concat(baris);
+
+        let kategoriAktif = '';
+
+        // Emoji pengganti foto, sesuai kategori
+        function emoji(kat) {
+            const k = (kat || '').toLowerCase();
+            if (k.includes('sayur')) return '🥬';
+            if (k.includes('buah')) return '🍎';
+            if (k.includes('hewani')) return '🍗';
+            if (k.includes('nabati')) return '🫘';
+            if (k.includes('protein')) return '🍗';
+            if (k.includes('karbo')) return '🍚';
+            if (k.includes('susu')) return '🥛';
+            if (k.includes('lemak') || k.includes('minyak')) return '🫒';
+            if (k.includes('bumbu')) return '🧂';
+            return '🌿';
+        }
+        document.querySelectorAll('.foto-kosong, .thumb.kosong').forEach(function (el) {
+            el.textContent = emoji(el.dataset.kat);
+        });
+
+        // Chip kategori + jumlah
+        const hitung = {};
+        kartu.forEach(function (k) {
+            const kat = k.dataset.kategori;
+            if (kat) hitung[kat] = (hitung[kat] || 0) + 1;
+        });
+
+        function buatChip(label, nilai, jumlah) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'chip' + (nilai === '' ? ' aktif' : '');
+            b.dataset.nilai = nilai;
+            b.innerHTML = label + ' <span>' + jumlah + '</span>';
+            b.addEventListener('click', function () {
+                kategoriAktif = nilai;
+                boxChips.querySelectorAll('.chip').forEach(function (c) {
+                    c.classList.toggle('aktif', c.dataset.nilai === nilai);
+                });
+                saring();
             });
+            boxChips.appendChild(b);
+        }
 
+        if (kartu.length) {
+            buatChip('Semua', '', kartu.length);
+            Object.keys(hitung).sort().forEach(function (k) {
+                buatChip(k, k, hitung[k]);
+            });
+        }
+
+        // Cari + filter kategori (berlaku untuk kartu dan tabel)
         function saring() {
             const q = kotakCari.value.toLowerCase();
-            const kat = pilihKategori.value;
-            let tampil = 0;
 
-            baris.forEach(function (b) {
+            semua.forEach(function (el) {
                 const cocok =
-                    b.dataset.nama.toLowerCase().includes(q) &&
-                    (kat === '' || b.dataset.kategori === kat);
-                b.style.display = cocok ? '' : 'none';
-                if (cocok) {
-                    tampil++;
-                    b.querySelector('.no').textContent = tampil;
+                    el.dataset.nama.toLowerCase().includes(q) &&
+                    (kategoriAktif === '' || el.dataset.kategori === kategoriAktif);
+                el.style.display = cocok ? '' : 'none';
+            });
+
+            let tampil = 0;
+            kartu.forEach(function (k) { if (k.style.display !== 'none') tampil++; });
+
+            let n = 0;
+            baris.forEach(function (r) {
+                if (r.style.display !== 'none') {
+                    n++;
+                    r.querySelector('.no').textContent = n;
                 }
             });
 
-            info.textContent = baris.length
-                ? 'Menampilkan ' + tampil + ' dari ' + baris.length + ' bahan'
+            info.textContent = kartu.length
+                ? 'Menampilkan ' + tampil + ' dari ' + kartu.length + ' bahan'
                 : '';
+            pesanKosong.hidden = !(kartu.length > 0 && tampil === 0);
         }
 
         kotakCari.addEventListener('input', saring);
-        pilihKategori.addEventListener('change', saring);
+
+        // Pindah tampilan kartu / tabel (pilihan diingat)
+        const tombolView = document.querySelectorAll('.view-toggle button');
+
+        function setView(v) {
+            wadah.dataset.view = v;
+            tombolView.forEach(function (b) {
+                b.classList.toggle('aktif', b.dataset.view === v);
+            });
+            try { localStorage.setItem('viewBahan', v); } catch (e) {}
+        }
+
+        tombolView.forEach(function (b) {
+            b.addEventListener('click', function () { setView(b.dataset.view); });
+        });
+
+        try {
+            const simpan = localStorage.getItem('viewBahan');
+            if (simpan === 'kartu' || simpan === 'tabel') setView(simpan);
+        } catch (e) {}
+
         saring();
     </script>
 

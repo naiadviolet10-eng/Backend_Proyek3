@@ -9,9 +9,8 @@ import (
 	"strings"
 )
 
-// =====================================================
 // MODEL RESEP DAN GIZI
-// =====================================================
+// Resep dibuat oleh AI dan hanya dibaca oleh aplikasi ini.
 
 type Gizi struct {
 	Kalori      float64
@@ -55,8 +54,11 @@ type ResepView struct {
 	Total    Gizi
 	PerPorsi Gizi
 	Alergen  []string
+	MenuID   int    // 0 jika resep belum menempel ke menu
+	MenuNama string // nama menu tempat resep ini menempel
 }
 
+// Pilihan bahan di dropdown form (dipakai form menu)
 type BahanOpsi struct {
 	ID    int
 	Label string
@@ -69,9 +71,7 @@ type FormResep struct {
 	Opsi   []BahanOpsi
 }
 
-// =====================================================
 // TEMPLATE
-// =====================================================
 
 var funcsResep = template.FuncMap{
 	"inc": func(i int) int {
@@ -99,9 +99,7 @@ func renderResep(w http.ResponseWriter, namaTemplate string, data any) {
 	}
 }
 
-// =====================================================
 // DATA BAHAN DAN HITUNG GIZI
-// =====================================================
 
 func petaBahan(daftar []Bahan) map[int]Bahan {
 	hasil := make(map[int]Bahan, len(daftar))
@@ -172,9 +170,7 @@ func hitungView(r Resep, bahanMap map[int]Bahan) ResepView {
 	return view
 }
 
-// =====================================================
 // FORM RESEP
-// =====================================================
 
 func bacaFormResep(r *http.Request) (Resep, string) {
 	if err := r.ParseForm(); err != nil {
@@ -268,39 +264,9 @@ func tampilkanFormResep(
 	})
 }
 
-// =====================================================
 // DAFTAR RESEP
-// =====================================================
 
-// Fungsi ini memerlukan templates/resep.html.
-// Jika route /resep masih diarahkan ke /menu di main.go,
-// halaman daftar resep ini belum dipanggil.
-func resepListPage(w http.ResponseWriter, r *http.Request) {
-	daftar, err := dbSemuaResep(context.Background())
-	if err != nil {
-		http.Error(w, "Gagal mengambil data resep: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	daftarBahan, err := dbSemuaBahan(context.Background())
-	if err != nil {
-		http.Error(w, "Gagal mengambil data bahan: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	bahanMap := petaBahan(daftarBahan)
-	views := make([]ResepView, 0, len(daftar))
-
-	for _, resep := range daftar {
-		views = append(views, hitungView(resep, bahanMap))
-	}
-
-	renderResep(w, "resep.html", views)
-}
-
-// =====================================================
 // TAMBAH RESEP
-// =====================================================
 
 func tambahResepPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
@@ -327,9 +293,7 @@ func tambahResepPage(w http.ResponseWriter, r *http.Request) {
 	tampilkanFormResep(w, "Tambah Resep", "/resep/tambah", Resep{Porsi: 1})
 }
 
-// =====================================================
 // DETAIL, EDIT, HAPUS
-// =====================================================
 
 func aksiResepPage(w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(strings.TrimPrefix(r.URL.Path, "/resep/"), "/")
@@ -345,20 +309,7 @@ func aksiResepPage(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-
-	if len(bagian) == 1 {
-		detailResep(w, r, id)
-		return
-	}
-
-	switch bagian[1] {
-	case "edit":
-		editResep(w, r, id)
-	case "hapus":
-		hapusResep(w, r, id)
-	default:
-		http.NotFound(w, r)
-	}
+	detailResep(w, r, id)
 }
 
 func detailResep(w http.ResponseWriter, r *http.Request, id int) {
@@ -373,9 +324,18 @@ func detailResep(w http.ResponseWriter, r *http.Request, id int) {
 		http.Error(w, "Gagal mengambil data bahan: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+	perResep, _, err := muatTautan(r)
+	if err != nil {
+		galat(w, "Gagal membaca menu resep", err)
+		return
+	}
 
-	view := hitungView(resep, petaBahan(daftarBahan))
-	renderResep(w, "detail_resep.html", view)
+	v := hitungView(resep, petaBahan(daftarBahan))
+	if t, ada := perResep[id]; ada {
+		v.MenuID = t.MenuID
+		v.MenuNama = t.MenuNama
+	}
+	renderResep(w, "detail_resep.html", v)
 }
 
 func editResep(w http.ResponseWriter, r *http.Request, id int) {

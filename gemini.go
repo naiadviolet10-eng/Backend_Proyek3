@@ -145,7 +145,7 @@ func (g *gemini) kirim(model, prompt string) ([]byte, int, error) {
 		return nil, 0, err
 	}
 	defer resp.Body.Close()
-	body, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	body, _ := io.ReadAll(io.LimitReader(resp.Body, maksBacaBody))
 	return body, resp.StatusCode, nil
 }
 
