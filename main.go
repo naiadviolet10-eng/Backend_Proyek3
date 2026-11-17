@@ -10,18 +10,21 @@ import (
 )
 
 func main() {
-<<<<<<< HEAD
-=======
 	_ = godotenv.Load()
 
->>>>>>> origin/rizal
 	if err := initDB(); err != nil {
 		log.Fatal("Gagal konek ke database: ", err)
 	}
 	defer db.Close()
 	fmt.Println("Terhubung ke database")
 
-<<<<<<< HEAD
+	jalankanMigrasi(context.Background())
+
+	daftarkanAPI()
+
+	// Jalankan cron job untuk hapus bahan kadaluarsa
+	go jalankanCronJob()
+
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	http.HandleFunc("/login", loginHandler)
@@ -32,9 +35,7 @@ func main() {
 	http.HandleFunc("/api/resep/tersimpan", resepTersimpanHandler)
 	http.HandleFunc("/api/resep/tersimpan/", hapusResepTersimpanHandler)
 
-	// API analisis pertumbuhan anak menggunakan standar WHO.
-	// Handler didefinisikan di file pertumbuhan.go.
-	http.HandleFunc("/api/pertumbuhan/analisis", analisisPertumbuhanHandler)
+	http.HandleFunc("/api/pertumbuhan/analisis", wajibLoginAPI(analisisPertumbuhanHandler))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
@@ -52,7 +53,8 @@ func main() {
 	http.HandleFunc("/bahan/", requireLogin(aksiBahanPage))
 
 	// FITUR RESEP (resep.go)
-	// Daftar resep digabung ke halaman /menu.
+	// Daftar resep sudah digabung ke halaman /menu.
+	// /resep diarahkan ke /menu; detail, tambah, edit & hapus tetap tersedia.
 	http.HandleFunc("/resep", requireLogin(func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/menu", http.StatusSeeOther)
 	}))
@@ -64,19 +66,6 @@ func main() {
 	http.HandleFunc("/menu/", requireLogin(aksiMenuPage)) // detail, edit & hapus
 
 	http.HandleFunc("/monitoring", requireLogin(monitoringPage))
-
-	http.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, `{"message": "Backend Pangan Bijak berjalan", "status": "success"}`)
-	})
-=======
-	jalankanMigrasi(context.Background())
-
-	daftarkanAPI()
-
-	// Jalankan cron job untuk hapus bahan kadaluarsa
-	go jalankanCronJob()
->>>>>>> origin/rizal
 
 	fmt.Println("Server berjalan di http://localhost:8080")
 	if err := http.ListenAndServe(":8080", enableCORS(http.DefaultServeMux)); err != nil {

@@ -11,11 +11,15 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-const kolomStok = `
+// batasHariExpiring: stok ditandai 'expiring' bila sisa kadaluarsanya
+// tidak lebih dari 3 hari.
+const batasHariExpiring = 3
+
+var kolomStok = `
 	s.id, s.jumlah::float8, s.satuan, s.tanggal_kadaluarsa::text,
 	CASE WHEN s.tanggal_kadaluarsa IS NULL THEN 'fresh'
 	     WHEN (s.tanggal_kadaluarsa - CURRENT_DATE) < 0 THEN 'expired'
-	     WHEN (s.tanggal_kadaluarsa - CURRENT_DATE) <= 3 THEN 'expiring'
+	     WHEN (s.tanggal_kadaluarsa - CURRENT_DATE) <= ` + strconv.Itoa(batasHariExpiring) + ` THEN 'expiring'
 	     ELSE 'fresh' END,
 	CASE WHEN s.tanggal_kadaluarsa IS NULL THEN NULL ELSE (s.tanggal_kadaluarsa - CURRENT_DATE) END,`
 
@@ -65,7 +69,7 @@ func daftarStok(ctx context.Context, r *http.Request, userID, status string, kat
 	rows, err := db.Query(ctx, `SELECT `+kolomStok+kolomBahanAPI+dasarStok+`
 		WHERE s.user_id = $1
 		  AND ($2 = 0 OR i.category_id = $2)
-		  AND ($3 = '' OR ($3 = 'expiring' AND s.tanggal_kadaluarsa IS NOT NULL AND (s.tanggal_kadaluarsa - CURRENT_DATE) >= 0 AND (s.tanggal_kadaluarsa - CURRENT_DATE) <= 3)
+		  AND ($3 = '' OR ($3 = 'expiring' AND s.tanggal_kadaluarsa IS NOT NULL AND (s.tanggal_kadaluarsa - CURRENT_DATE) >= 0 AND (s.tanggal_kadaluarsa - CURRENT_DATE) <= `+strconv.Itoa(batasHariExpiring)+`)
 		              OR ($3 = 'expired' AND s.tanggal_kadaluarsa IS NOT NULL AND (s.tanggal_kadaluarsa - CURRENT_DATE) < 0))
 		ORDER BY s.id DESC`, userID, kategoriID, filterStatus)
 	if err != nil {
@@ -163,9 +167,7 @@ func apiTambahStok(w http.ResponseWriter, r *http.Request) {
 		kirimPesan(w, http.StatusInternalServerError, "Gagal memuat stok")
 		return
 	}
-	kirimJSON(w, http.StatusCreated, map[string]any{
-		"success": true, "message": "Stok berhasil ditambahkan", "data": s,
-	})
+	kirimDataPesan(w, http.StatusCreated, "Stok berhasil ditambahkan", s)
 }
 
 // GET /api/stocks/{id}
@@ -239,9 +241,7 @@ func apiUbahStok(w http.ResponseWriter, r *http.Request) {
 		kirimPesan(w, http.StatusInternalServerError, "Gagal memuat stok")
 		return
 	}
-	kirimJSON(w, http.StatusOK, map[string]any{
-		"success": true, "message": "Stok berhasil diperbarui", "data": s,
-	})
+	kirimDataPesan(w, http.StatusOK, "Stok berhasil diperbarui", s)
 }
 
 // DELETE /api/stocks/{id}

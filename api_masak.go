@@ -275,22 +275,18 @@ func apiCatatMasak(w http.ResponseWriter, r *http.Request) {
 	if len(insufficient) > 0 {
 		pesan = "Memasak tercatat, tapi sebagian bahan kurang."
 	}
-	kirimJSON(w, http.StatusCreated, map[string]any{
-		"success": true,
-		"message": pesan,
-		"data": map[string]any{
-			"id":               logID,
-			"recipe_id":        isian.RecipeID,
-			"recipe_name":      namaResep,
-			"servings":         isian.Servings,
-			"cooked_at":        cookedAt.Format(time.RFC3339),
-			"duration_minutes": isian.DurationMinutes,
-			"deducted":         deducted,
-			"removed":          removed,
-			"skipped":          skipped,
-			"insufficient":     insufficient,
-			"nutrition":        nutrisi,
-		},
+	kirimDataPesan(w, http.StatusCreated, pesan, map[string]any{
+		"id":               logID,
+		"recipe_id":        isian.RecipeID,
+		"recipe_name":      namaResep,
+		"servings":         isian.Servings,
+		"cooked_at":        cookedAt.Format(time.RFC3339),
+		"duration_minutes": isian.DurationMinutes,
+		"deducted":         deducted,
+		"removed":          removed,
+		"skipped":          skipped,
+		"insufficient":     insufficient,
+		"nutrition":        nutrisi,
 	})
 }
 

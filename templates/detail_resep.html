@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Nama}} - Dapur Cerdas</title>
+    <link rel="stylesheet" href="/static/css/resep.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <img src="/static/img/logo_dapur_cerdas.png" alt="Logo Dapur Cerdas">
+            <div>
+                <h1>{{.Nama}}</h1>
+                <p>{{if .Deskripsi}}{{.Deskripsi}}{{else}}Detail resep dan nilai gizi{{end}}</p>
+            </div>
+        </div>
+        <a href="/resep" class="back-button">← Resep</a>
+    </header>
+
+    <main class="container narrow">
+
+        {{if .Alergen}}
+        <div class="peringatan">
+            <strong>Mengandung alergen:</strong>
+            {{range .Alergen}}<span class="badge">{{.}}</span>{{end}}
+        </div>
+        {{end}}
+
+        <section class="form-card">
+            <h3>Gizi per Porsi <span class="hint">resep ini untuk {{.Porsi}} porsi</span></h3>
+            <div class="gizi-grid">
+                <div class="gizi-item"><span>{{f1 .PerPorsi.Kalori}}</span><small>Kalori (kkal)</small></div>
+                <div class="gizi-item"><span>{{f1 .PerPorsi.Protein}}</span><small>Protein (g)</small></div>
+                <div class="gizi-item"><span>{{f1 .PerPorsi.Lemak}}</span><small>Lemak (g)</small></div>
+                <div class="gizi-item"><span>{{f1 .PerPorsi.Karbohidrat}}</span><small>Karbohidrat (g)</small></div>
+                <div class="gizi-item"><span>{{f1 .PerPorsi.Serat}}</span><small>Serat (g)</small></div>
+                <div class="gizi-item"><span>{{f1 .PerPorsi.Gula}}</span><small>Gula (g)</small></div>
+                <div class="gizi-item"><span>{{f1 .PerPorsi.Natrium}}</span><small>Natrium (mg)</small></div>
+                <div class="gizi-item"><span>{{f1 .PerPorsi.Kolesterol}}</span><small>Kolesterol (mg)</small></div>
+            </div>
+            <p class="catatan">Total seluruh resep: {{f1 .Total.Kalori}} kkal, {{f1 .Total.Protein}} g protein, {{f1 .Total.Lemak}} g lemak, {{f1 .Total.Karbohidrat}} g karbohidrat.</p>
+        </section>
+
+        <section class="form-card">
+            <h3>Bahan</h3>
+            <table class="tabel-kecil">
+                <thead>
+                    <tr><th>Bahan</th><th>Jumlah</th><th>Berat</th></tr>
+                </thead>
+                <tbody>
+                    {{range .Baris}}
+                    <tr>
+                        <td>{{.Nama}}</td>
+                        <td>{{f1 .Jumlah}} {{.Satuan}}</td>
+                        <td>{{f1 .Gram}} g</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </section>
+
+        {{if .Langkah}}
+        <section class="form-card">
+            <h3>Langkah Memasak</h3>
+            <p class="langkah">{{.Langkah}}</p>
+        </section>
+        {{end}}
+
+        <div class="form-actions">
+            <a href="/resep/{{.ID}}/edit" class="btn-simpan">Edit Resep</a>
+        </div>
+
+    </main>
+
+</body>
+</html>

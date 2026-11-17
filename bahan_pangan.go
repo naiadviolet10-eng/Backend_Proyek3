@@ -10,10 +10,8 @@ import (
 	"strings"
 )
 
-// =========================
 // STRUKTUR DATA BAHAN PANGAN
 // (sesuai tabel ingredients_master)
-// =========================
 
 type Bahan struct {
 	ID          int
@@ -29,7 +27,7 @@ type Bahan struct {
 	Seng        float64
 	VitaminA    float64
 	VitaminC    float64
-	Gambar      string // BARU: alamat foto, contoh /static/uploads/bahan/ab12cd.jpg
+	Gambar      string // alamat foto, contoh /static/uploads/bahan/ab12cd.jpg
 }
 
 // Satu baris dari tabel ingredient_categories
@@ -49,12 +47,10 @@ type FormBahan struct {
 // Batas nilai kolom numeric(6,2)
 const batasAngka = 9999.99
 
-// BARU: batas ukuran seluruh isi form (foto maksimal 2 MB + isian lain)
+// batas ukuran seluruh isi form (foto maksimal 2 MB + isian lain)
 const maksForm = 4 << 20
 
-// =========================
 // HELPER
-// =========================
 
 // Mengubah teks form menjadi angka (kosong atau salah = 0)
 func parseFloat(s string) float64 {
@@ -74,7 +70,7 @@ func galat(w http.ResponseWriter, pesan string, err error) {
 // Membaca isian form menjadi struct Bahan (ID dan Gambar diisi oleh pemanggil)
 func bacaForm(r *http.Request) (Bahan, string) {
 
-	// BARU: form berisi file tidak terbaca oleh ParseForm biasa
+	// form berisi file tidak terbaca oleh ParseForm biasa
 	if err := r.ParseMultipartForm(maksForm); err != nil && !errors.Is(err, http.ErrNotMultipart) {
 		return Bahan{}, "Form tidak valid atau file terlalu besar: " + err.Error()
 	}
@@ -127,9 +123,7 @@ func bacaForm(r *http.Request) (Bahan, string) {
 	return b, ""
 }
 
-// =========================
 // FORM TAMBAH / EDIT BAHAN
-// =========================
 
 func tampilkanForm(w http.ResponseWriter, r *http.Request, data FormBahan) {
 
@@ -163,9 +157,7 @@ func tampilkanForm(w http.ResponseWriter, r *http.Request, data FormBahan) {
 	}
 }
 
-// =========================
 // HALAMAN BAHAN PANGAN
-// =========================
 
 func bahanPanganPage(w http.ResponseWriter, r *http.Request) {
 
@@ -198,15 +190,13 @@ func bahanPanganPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// =========================
 // HALAMAN TAMBAH BAHAN
-// =========================
 
 func tambahBahanPage(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 
-		r.Body = http.MaxBytesReader(w, r.Body, maksForm) // BARU
+		r.Body = http.MaxBytesReader(w, r.Body, maksForm)
 
 		bahan, pesan := bacaForm(r)
 		if pesan != "" {
@@ -214,7 +204,7 @@ func tambahBahanPage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// BARU: simpan foto (kosong kalau tidak ada yang diunggah)
+		// simpan foto (kosong kalau tidak ada yang diunggah)
 		gambar, err := simpanGambar(r, "gambar")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -223,7 +213,7 @@ func tambahBahanPage(w http.ResponseWriter, r *http.Request) {
 		bahan.Gambar = gambar
 
 		if err := dbTambahBahan(r.Context(), bahan); err != nil {
-			hapusFileGambar(gambar) // BARU: batalkan file yang sudah terlanjur tersimpan
+			hapusFileGambar(gambar) // batalkan file yang sudah terlanjur tersimpan
 			galat(w, "Gagal menyimpan bahan", err)
 			return
 		}
@@ -240,9 +230,7 @@ func tambahBahanPage(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// =========================
 // EDIT & HAPUS BAHAN
-// =========================
 
 func aksiBahanPage(w http.ResponseWriter, r *http.Request) {
 
@@ -274,7 +262,7 @@ func editBahan(w http.ResponseWriter, r *http.Request, id int) {
 
 	if r.Method == http.MethodPost {
 
-		r.Body = http.MaxBytesReader(w, r.Body, maksForm) // BARU
+		r.Body = http.MaxBytesReader(w, r.Body, maksForm)
 
 		baru, pesan := bacaForm(r)
 		if pesan != "" {
@@ -284,7 +272,7 @@ func editBahan(w http.ResponseWriter, r *http.Request, id int) {
 
 		baru.ID = id
 
-		// BARU: ambil data lama untuk tahu foto yang sedang dipakai
+		// ambil data lama untuk tahu foto yang sedang dipakai
 		lama, err := dbBahanByID(r.Context(), id)
 		if err != nil {
 			if tidakAda(err) {
@@ -309,7 +297,7 @@ func editBahan(w http.ResponseWriter, r *http.Request, id int) {
 		}
 
 		if err := dbUbahBahan(r.Context(), baru); err != nil {
-			hapusFileGambar(gambarBaru) // BARU: batalkan foto baru yang sudah tersimpan
+			hapusFileGambar(gambarBaru) // batalkan foto baru yang sudah tersimpan
 			if tidakAda(err) {
 				http.NotFound(w, r)
 				return
@@ -318,7 +306,7 @@ func editBahan(w http.ResponseWriter, r *http.Request, id int) {
 			return
 		}
 
-		// BARU: buang file foto lama kalau sudah diganti atau dihapus
+		// buang file foto lama kalau sudah diganti atau dihapus
 		if lama.Gambar != baru.Gambar {
 			hapusFileGambar(lama.Gambar)
 		}
@@ -353,7 +341,7 @@ func hapusBahan(w http.ResponseWriter, r *http.Request, id int) {
 		return
 	}
 
-	lama, _ := dbBahanByID(r.Context(), id) // BARU: untuk tahu foto mana yang dibuang
+	lama, _ := dbBahanByID(r.Context(), id) // untuk tahu foto mana yang dibuang
 
 	if err := dbHapusBahan(r.Context(), id); err != nil {
 		if bahanDipakai(err) {
@@ -366,7 +354,7 @@ func hapusBahan(w http.ResponseWriter, r *http.Request, id int) {
 		return
 	}
 
-	hapusFileGambar(lama.Gambar) // BARU: hapus file foto setelah data berhasil dihapus
+	hapusFileGambar(lama.Gambar) // hapus file foto setelah data berhasil dihapus
 
 	catatAktivitas(r.Context(), "bahan", "hapus", lama.NamaBahan)
 

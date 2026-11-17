@@ -89,14 +89,60 @@ type HasilResepAI struct {
 	Tips       string         `json:"tips"`
 }
 
-func jsonResponse(w http.ResponseWriter, status int, data any) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(data)
+// errorResponse membalas {"message": ...} tanpa amplop; front-end resep
+// membaca langsung field message, bukan success/data.
+func errorResponse(w http.ResponseWriter, status int, message string) {
+	kirimJSON(w, status, map[string]string{"message": message})
 }
 
-func errorResponse(w http.ResponseWriter, status int, message string) {
-	jsonResponse(w, status, map[string]string{"message": message})
+// ambilStokResep mengambil stok bahan milik pengguna yang masih dipakai
+// (jumlah > 0 dan belum kadaluarsa) beserta data nutrisinya.
+func ambilStokResep(ctx context.Context, userID string) ([]StokResep, error) {
+	rows, err := db.Query(ctx, `
+		SELECT
+			s.id,
+			m.id,
+			m.name,
+			s.jumlah::float8,
+			s.satuan,
+			COALESCE(c.name, ''),
+			COALESCE(m.image_path, ''),
+			COALESCE(s.tanggal_kadaluarsa::text, ''),
+			COALESCE(m.calories_per_100g, 0)::float8,
+			COALESCE(m.protein_g, 0)::float8,
+			COALESCE(m.fat_g, 0)::float8,
+			COALESCE(m.carbs_g, 0)::float8,
+			COALESCE(m.iron_mg, 0)::float8,
+			COALESCE(m.zinc_mg, 0)::float8,
+			COALESCE(m.vitamin_a_mcg, 0)::float8,
+			COALESCE(m.vitamin_c_mg, 0)::float8
+		FROM public.stok s
+		JOIN public.ingredients_master m ON m.id = s.bahan_pangan_id
+		LEFT JOIN public.ingredient_categories c ON c.id = m.category_id
+		WHERE s.user_id = $1
+			AND s.jumlah > 0
+			AND (s.tanggal_kadaluarsa IS NULL OR s.tanggal_kadaluarsa >= CURRENT_DATE)
+		ORDER BY s.tanggal_kadaluarsa ASC NULLS LAST, m.name ASC
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	items := make([]StokResep, 0)
+	for rows.Next() {
+		var item StokResep
+		if err := rows.Scan(
+			&item.ID, &item.IngredientID, &item.Nama, &item.Jumlah, &item.Satuan,
+			&item.Kategori, &item.ImagePath, &item.Kadaluarsa, &item.Kalori100g,
+			&item.Protein100g, &item.Lemak100g, &item.Karbo100g, &item.ZatBesi100g,
+			&item.Zinc100g, &item.VitaminA100g, &item.VitaminC100g,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	return items, rows.Err()
 }
 
 // Verifikasi token melalui Supabase Auth.
@@ -162,73 +208,13 @@ func resepBahanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := db.Query(r.Context(), `
-		SELECT
-			s.id,
-			m.id,
-			m.name,
-			s.jumlah::float8,
-			s.satuan,
-			COALESCE(c.name, ''),
-			 COALESCE(m.image_path, ''),
-			COALESCE(s.tanggal_kadaluarsa::text, ''),
-			COALESCE(m.calories_per_100g, 0)::float8,
-			COALESCE(m.protein_g, 0)::float8,
-			COALESCE(m.fat_g, 0)::float8,
-			COALESCE(m.carbs_g, 0)::float8,
-			COALESCE(m.iron_mg, 0)::float8,
-			COALESCE(m.zinc_mg, 0)::float8,
-			COALESCE(m.vitamin_a_mcg, 0)::float8,
-			COALESCE(m.vitamin_c_mg, 0)::float8
-		FROM public.stok s
-		JOIN public.ingredients_master m ON m.id = s.bahan_pangan_id
-		LEFT JOIN public.ingredient_categories c ON c.id = m.category_id
-		WHERE s.user_id = $1
-			AND s.jumlah > 0
-			AND (s.tanggal_kadaluarsa IS NULL OR s.tanggal_kadaluarsa >= CURRENT_DATE)
-		ORDER BY s.tanggal_kadaluarsa ASC NULLS LAST, m.name ASC
-	`, userID)
+	items, err := ambilStokResep(r.Context(), userID)
 	if err != nil {
 		log.Printf("ERROR query stok resep: %v", err)
 		errorResponse(w, http.StatusInternalServerError, "Gagal mengambil stok bahan")
 		return
 	}
-	defer rows.Close()
-
-	items := make([]StokResep, 0)
-	for rows.Next() {
-		var item StokResep
-		err := rows.Scan(
-    &item.ID,
-    &item.IngredientID,
-    &item.Nama,
-    &item.Jumlah,
-    &item.Satuan,
-    &item.Kategori,
-    &item.ImagePath,
-    &item.Kadaluarsa,
-    &item.Kalori100g,
-    &item.Protein100g,
-    &item.Lemak100g,
-    &item.Karbo100g,
-    &item.ZatBesi100g,
-    &item.Zinc100g,
-    &item.VitaminA100g,
-    &item.VitaminC100g,
-		)
-		if err != nil {
-			log.Printf("ERROR membaca stok resep: %v", err)
-			errorResponse(w, http.StatusInternalServerError, "Gagal membaca data stok")
-			return
-		}
-		items = append(items, item)
-	}
-	if err := rows.Err(); err != nil {
-		log.Printf("ERROR hasil query stok resep: %v", err)
-		errorResponse(w, http.StatusInternalServerError, "Gagal membaca hasil stok")
-		return
-	}
-	jsonResponse(w, http.StatusOK, map[string]any{"items": items})
+	kirimJSON(w, http.StatusOK, map[string]any{"items": items})
 }
 
 // POST /api/resep/racik
@@ -245,7 +231,7 @@ func resepRacikHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+	r.Body = http.MaxBytesReader(w, r.Body, maksBacaBody)
 	var input PermintaanResep
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		errorResponse(w, http.StatusBadRequest, "Data permintaan tidak valid")
@@ -265,57 +251,10 @@ func resepRacikHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Ambil stok milik pengguna yang sudah diverifikasi.
-	rows, err := db.Query(r.Context(), `
-		SELECT
-			s.id,
-			m.id,
-			m.name,
-			s.jumlah::float8,
-			s.satuan,
-			COALESCE(c.name, ''),
-			COALESCE(s.tanggal_kadaluarsa::text, ''),
-			COALESCE(m.calories_per_100g, 0)::float8,
-			COALESCE(m.protein_g, 0)::float8,
-			COALESCE(m.fat_g, 0)::float8,
-			COALESCE(m.carbs_g, 0)::float8,
-			COALESCE(m.iron_mg, 0)::float8,
-			COALESCE(m.zinc_mg, 0)::float8,
-			COALESCE(m.vitamin_a_mcg, 0)::float8,
-			COALESCE(m.vitamin_c_mg, 0)::float8
-		FROM public.stok s
-		JOIN public.ingredients_master m ON m.id = s.bahan_pangan_id
-		LEFT JOIN public.ingredient_categories c ON c.id = m.category_id
-		WHERE s.user_id = $1
-			AND s.jumlah > 0
-			AND (s.tanggal_kadaluarsa IS NULL OR s.tanggal_kadaluarsa >= CURRENT_DATE)
-	`, userID)
+	stokTersedia, err := ambilStokResep(r.Context(), userID)
 	if err != nil {
 		log.Printf("ERROR query stok untuk racik resep: %v", err)
 		errorResponse(w, http.StatusInternalServerError, "Gagal mengambil stok")
-		return
-	}
-
-	var stokTersedia []StokResep
-	for rows.Next() {
-		var item StokResep
-		if err := rows.Scan(
-			&item.ID, &item.IngredientID, &item.Nama, &item.Jumlah, &item.Satuan,
-			&item.Kategori, &item.Kadaluarsa, &item.Kalori100g, &item.Protein100g,
-			&item.Lemak100g, &item.Karbo100g, &item.ZatBesi100g, &item.Zinc100g,
-			&item.VitaminA100g, &item.VitaminC100g,
-		); err != nil {
-			rows.Close()
-			log.Printf("ERROR scan stok untuk resep: %v", err)
-			errorResponse(w, http.StatusInternalServerError, "Gagal membaca stok")
-			return
-		}
-		stokTersedia = append(stokTersedia, item)
-	}
-	err = rows.Err()
-	rows.Close()
-	if err != nil {
-		log.Printf("ERROR membaca hasil stok resep: %v", err)
-		errorResponse(w, http.StatusInternalServerError, "Gagal membaca hasil stok")
 		return
 	}
 
@@ -346,7 +285,7 @@ func resepRacikHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stokJSON, err := json.Marshal(terpilih)
+	bahanTerpilihJSON, err := json.Marshal(terpilih)
 	if err != nil {
 		log.Printf("ERROR marshal stok resep: %v", err)
 		errorResponse(w, http.StatusInternalServerError, "Gagal menyiapkan data bahan")
@@ -413,7 +352,7 @@ Aturan:
   "tips": "string"
 }
 Nilai nutrisi adalah total perkiraan untuk seluruh resep.
-`, input.Servings, target, string(stokJSON), string(familyJSON), input.Servings)
+`, input.Servings, target, string(bahanTerpilihJSON), string(familyJSON), input.Servings)
 
 	// Timeout keseluruhan untuk proses Gemini.
 	ctx, cancel := context.WithTimeout(r.Context(), 90*time.Second)
@@ -524,5 +463,5 @@ Nilai nutrisi adalah total perkiraan untuk seluruh resep.
 	}
 
 	// Mengembalikan hasil resep, bukan data contoh dari React.
-	jsonResponse(w, http.StatusOK, resep)
+	kirimJSON(w, http.StatusOK, resep)
 }

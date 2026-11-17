@@ -29,9 +29,7 @@ func (r Ringkasan) PerluPerhatian() int {
 	return r.MenuTanpaBahan + r.MenuTanpaResep
 }
 
-// =========================
 // HELPER
-// =========================
 
 // Mencatat aktivitas admin. Kegagalan hanya dicatat di log,
 // supaya proses utama (simpan/hapus data) tidak ikut gagal.
@@ -91,9 +89,7 @@ func tampilanAktivitas(jenis, aksi, nama string) (ikon, judul, ket string) {
 	return ikon, objek, nama
 }
 
-// =========================
 // RINGKASAN DASHBOARD
-// =========================
 
 func dbRingkasan(ctx context.Context) Ringkasan {
 	var r Ringkasan

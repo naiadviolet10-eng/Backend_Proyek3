@@ -13,7 +13,7 @@ import (
 
 const (
 	folderGambar = "static/uploads/bahan"   // lokasi file di komputer
-	urlGambar    = "/static/uploads/bahan/" // alamat yang disimpan di database
+	prefixGambar = "/static/uploads/bahan/" // alamat yang disimpan di database
 	maksGambar   = 2 << 20                  // 2 MB
 )
 
@@ -77,13 +77,13 @@ func simpanGambar(r *http.Request, field string) (string, error) {
 		return "", err
 	}
 
-	return urlGambar + nama, nil
+	return prefixGambar + nama, nil
 }
 
 // Menghapus file foto dari folder upload.
 // Alamat di luar folder upload diabaikan, jadi file lain aman.
 func hapusFileGambar(url string) {
-	if !strings.HasPrefix(url, urlGambar) {
+	if !strings.HasPrefix(url, prefixGambar) {
 		return
 	}
 	os.Remove(filepath.Join(folderGambar, filepath.Base(url)))

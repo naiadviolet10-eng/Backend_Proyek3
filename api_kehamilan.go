@@ -237,11 +237,8 @@ func apiTambahKehamilan(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	kirimJSON(w, http.StatusCreated, map[string]any{
-		"success": true,
-		"message": "Profil kehamilan berhasil disimpan",
-		"data":    kehamilanDari(id, isian.MotherName, hpht, &hplBaru, "hamil", nil, catatan),
-	})
+	kirimDataPesan(w, http.StatusCreated, "Profil kehamilan berhasil disimpan",
+		kehamilanDari(id, isian.MotherName, hpht, &hplBaru, "hamil", nil, catatan))
 }
 
 // GET /api/pregnancies/{id}
@@ -360,11 +357,7 @@ func apiUbahKehamilan(w http.ResponseWriter, r *http.Request) {
 		kirimPesan(w, http.StatusInternalServerError, "Gagal memuat data kehamilan")
 		return
 	}
-	kirimJSON(w, http.StatusOK, map[string]any{
-		"success": true,
-		"message": "Profil kehamilan berhasil diperbarui",
-		"data":    k,
-	})
+	kirimDataPesan(w, http.StatusOK, "Profil kehamilan berhasil diperbarui", k)
 }
 
 // POST /api/pregnancies/{id}/delivery
@@ -488,13 +481,9 @@ func apiLahirkan(w http.ResponseWriter, r *http.Request) {
 	}
 
 	k := kehamilanDari(id, namaIbu, hpht, hplVal, "lahir", &lahir, catatanLama)
-	kirimJSON(w, http.StatusCreated, map[string]any{
-		"success": true,
-		"message": "Data kelahiran berhasil disimpan",
-		"data": map[string]any{
-			"pregnancy": k,
-			"child":     a,
-		},
+	kirimDataPesan(w, http.StatusCreated, "Data kelahiran berhasil disimpan", map[string]any{
+		"pregnancy": k,
+		"child":     a,
 	})
 }
 

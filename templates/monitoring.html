@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring - Dapur Cerdas</title>
+    <link rel="stylesheet" href="/static/css/monitoring.css">
+</head>
+
+<body>
+
+<main class="main-content">
+
+    <header class="topbar">
+        <div class="page-title">
+            <h1>Monitoring</h1>
+            <p>Pantau statistik, analisis gizi pengguna, food waste, dan penghematan.</p>
+        </div>
+
+        <div class="admin-info">
+            <div class="admin-avatar">A</div>
+            <div class="admin-text">
+                <strong>Admin</strong>
+                <small>Administrator</small>
+            </div>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="section-title">
+            <div>
+                <h2>Statistik Keseluruhan</h2>
+                <p>Ringkasan data penggunaan sistem.</p>
+            </div>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <span>Total Pengguna</span>
+                    <h3>{{.TotalPengguna}}</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🍲</div>
+                <div class="stat-content">
+                    <span>Total Resep</span>
+                    <h3>{{.TotalResep}}</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🥕</div>
+                <div class="stat-content">
+                    <span>Total Bahan</span>
+                    <h3>{{.TotalBahan}}</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-content">
+                    <span>Total Menu</span>
+                    <h3>{{.TotalMenu}}</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-title">
+            <div>
+                <h2>Analisis Gizi Pengguna</h2>
+                <p>Lihat data analisis gizi setiap pengguna.</p>
+            </div>
+
+            <div class="search-box">
+                <input type="text" placeholder="Cari nama pengguna...">
+                <button>🔍</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pengguna</th>
+                        <th>Usia</th>
+                        <th>Kalori</th>
+                        <th>Protein</th>
+                        <th>Status Gizi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {{range .Users}}
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">{{.Initial}}</div>
+                                <div class="user-info">
+                                    <strong>{{.Nama}}</strong>
+                                    <small>{{.Email}}</small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>{{.Usia}} tahun</td>
+                        <td>{{.Kalori}} kkal</td>
+                        <td>{{.Protein}} g</td>
+
+                        <td>
+                            <span class="status normal">{{.StatusGizi}}</span>
+                        </td>
+
+                        <td>
+                            <button class="detail-btn" onclick="showDetail('{{.Nama}}')">
+                                Lihat Analisis
+                            </button>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="bottom-grid">
+
+        <div class="monitor-card">
+            <div class="card-header">
+                <div>
+                    <h2>Dampak Food Waste</h2>
+                    <p>Ringkasan penggunaan bahan makanan.</p>
+                </div>
+                <div class="card-icon">♻️</div>
+            </div>
+
+            <div class="waste-data">
+                <div class="data-row">
+                    <span>Bahan Digunakan</span>
+                    <strong>{{.BahanDigunakan}} kg</strong>
+                </div>
+
+                <div class="data-row">
+                    <span>Bahan Terbuang</span>
+                    <strong>{{.BahanTerbuang}} kg</strong>
+                </div>
+
+                <div class="data-row">
+                    <span>Persentase Food Waste</span>
+                    <strong>{{.PersentaseWaste}}%</strong>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Efisiensi Bahan</span>
+                    <strong>{{.EfisiensiBahan}}%</strong>
+                </div>
+
+                <div class="progress">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="monitor-card">
+            <div class="card-header">
+                <div>
+                    <h2>Estimasi Penghematan</h2>
+                    <p>Estimasi penghematan dari pemanfaatan bahan.</p>
+                </div>
+                <div class="card-icon">💰</div>
+            </div>
+
+            <div class="saving-value">
+                <span>Total Estimasi Penghematan</span>
+                <h3>Rp {{.TotalPenghematan}}</h3>
+            </div>
+
+            <div class="saving-info">
+                <div>
+                    <span>Bahan Dimanfaatkan</span>
+                    <strong>{{.BahanDimanfaatkan}} kg</strong>
+                </div>
+
+                <div>
+                    <span>Periode</span>
+                    <strong>{{.Periode}}</strong>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+</main>
+
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+
+        <button class="close-btn" onclick="closeDetail()">×</button>
+
+        <div class="modal-header">
+            <div class="modal-avatar" id="modalAvatar">U</div>
+
+            <div>
+                <h2 id="modalNama">Analisis Gizi</h2>
+                <p>Detail analisis gizi pengguna</p>
+            </div>
+        </div>
+
+        <div class="nutrition-grid">
+            <div class="nutrition-card">
+                <span>🔥 Kalori</span>
+                <strong id="modalKalori">0 kkal</strong>
+            </div>
+
+            <div class="nutrition-card">
+                <span>🥩 Protein</span>
+                <strong id="modalProtein">0 g</strong>
+            </div>
+
+            <div class="nutrition-card">
+                <span>🍚 Karbohidrat</span>
+                <strong id="modalKarbo">0 g</strong>
+            </div>
+
+            <div class="nutrition-card">
+                <span>🥑 Lemak</span>
+                <strong id="modalLemak">0 g</strong>
+            </div>
+        </div>
+
+        <div class="analysis-box">
+            <h3>Kesimpulan Analisis</h3>
+            <p id="modalKesimpulan">
+                Data analisis gizi pengguna akan ditampilkan di sini.
+            </p>
+        </div>
+
+        <div class="recommendation-box">
+            <h3>💡 Rekomendasi</h3>
+            <p id="modalRekomendasi">
+                Rekomendasi menu akan ditampilkan berdasarkan hasil analisis gizi pengguna.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function showDetail(nama) {
+    document.getElementById("detailModal").classList.add("show");
+    document.getElementById("modalNama").innerText = "Analisis Gizi " + nama;
+    document.getElementById("modalAvatar").innerText = nama.charAt(0).toUpperCase();
+}
+
+function closeDetail() {
+    document.getElementById("detailModal").classList.remove("show");
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById("detailModal");
+
+    if (event.target === modal) {
+        closeDetail();
+    }
+};
+</script>
+
+</body>
+</html>

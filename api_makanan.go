@@ -58,6 +58,71 @@ func validasiWaktuMakan(wm string) bool {
 	return wm == "Sarapan" || wm == "Makan siang" || wm == "Makan malam" || wm == "Selingan"
 }
 
+// isianMakan adalah bagian isian catatan makan yang sama untuk anak dan ibu hamil.
+type isianMakan struct {
+	NamaMakanan     string   `json:"nama_makanan"`
+	TanggalKonsumsi string   `json:"tanggal_konsumsi"`
+	WaktuMakan      string   `json:"waktu_makan"`
+	Porsi           float64  `json:"porsi"`
+	KaloriKcal      *float64 `json:"kalori_kcal"`
+	ProteinG        *float64 `json:"protein_g"`
+	KarbohidratG    *float64 `json:"karbohidrat_g"`
+	LemakG          *float64 `json:"lemak_g"`
+	SeratG          *float64 `json:"serat_g"`
+}
+
+// isianTambahMakan menambahkan sumber dan resep saat catatan baru dibuat.
+type isianTambahMakan struct {
+	isianMakan
+	Sumber  string `json:"sumber"`
+	ResepID *int64 `json:"resep_id"`
+}
+
+// validasiEntriMakan memangkas spasi nama lalu memeriksa seluruh aturan entri
+// catatan makan. Mengembalikan tanggal konsumsi yang valid dan pesan galat
+// pertama; pesan kosong berarti isian lolos.
+func validasiEntriMakan(isian *isianMakan) (time.Time, string) {
+	isian.NamaMakanan = strings.TrimSpace(isian.NamaMakanan)
+	if isian.NamaMakanan == "" || len([]rune(isian.NamaMakanan)) > 120 {
+		return time.Time{}, "Nama makanan wajib diisi (maks 120 karakter)."
+	}
+	tgl, ok := validasiTanggal(isian.TanggalKonsumsi)
+	if !ok {
+		return time.Time{}, "Format tanggal tidak valid."
+	}
+	if tanggalMasaDepan(tgl) {
+		return time.Time{}, "Tanggal tidak boleh di masa depan."
+	}
+	if !validasiWaktuMakan(isian.WaktuMakan) {
+		return time.Time{}, "Waktu makan harus Sarapan, Makan siang, Makan malam, atau Selingan."
+	}
+	if isian.Porsi <= 0 {
+		return time.Time{}, "Porsi harus lebih dari nol."
+	}
+	if (isian.KaloriKcal != nil && *isian.KaloriKcal < 0) ||
+		(isian.ProteinG != nil && *isian.ProteinG < 0) ||
+		(isian.KarbohidratG != nil && *isian.KarbohidratG < 0) ||
+		(isian.LemakG != nil && *isian.LemakG < 0) ||
+		(isian.SeratG != nil && *isian.SeratG < 0) {
+		return time.Time{}, "Nilai gizi tidak boleh negatif."
+	}
+	return tgl, ""
+}
+
+// validasiRentangTanggal memeriksa start_date dan end_date pada daftar catatan.
+func validasiRentangTanggal(startDate, endDate string) string {
+	if startDate == "" || endDate == "" {
+		return "start_date dan end_date wajib"
+	}
+	if _, ok := validasiTanggal(startDate); !ok {
+		return "Format tanggal tidak valid (YYYY-MM-DD)"
+	}
+	if _, ok := validasiTanggal(endDate); !ok {
+		return "Format tanggal tidak valid (YYYY-MM-DD)"
+	}
+	return ""
+}
+
 func apiDaftarFoodLogs(w http.ResponseWriter, r *http.Request) {
 	u, _ := penggunaKonteks(r.Context())
 	childID := r.URL.Query().Get("child_id")
@@ -68,16 +133,8 @@ func apiDaftarFoodLogs(w http.ResponseWriter, r *http.Request) {
 		kirimPesan(w, http.StatusBadRequest, "child_id wajib")
 		return
 	}
-	if startDate == "" || endDate == "" {
-		kirimPesan(w, http.StatusBadRequest, "start_date dan end_date wajib")
-		return
-	}
-	if _, ok := validasiTanggal(startDate); !ok {
-		kirimPesan(w, http.StatusBadRequest, "Format tanggal tidak valid (YYYY-MM-DD)")
-		return
-	}
-	if _, ok := validasiTanggal(endDate); !ok {
-		kirimPesan(w, http.StatusBadRequest, "Format tanggal tidak valid (YYYY-MM-DD)")
+	if pesan := validasiRentangTanggal(startDate, endDate); pesan != "" {
+		kirimPesan(w, http.StatusBadRequest, pesan)
 		return
 	}
 
@@ -122,52 +179,17 @@ func apiDaftarFoodLogs(w http.ResponseWriter, r *http.Request) {
 func apiTambahFoodLog(w http.ResponseWriter, r *http.Request) {
 	u, _ := penggunaKonteks(r.Context())
 	var isian struct {
-		ChildID         string   `json:"child_id"`
-		NamaMakanan     string   `json:"nama_makanan"`
-		TanggalKonsumsi string   `json:"tanggal_konsumsi"`
-		WaktuMakan      string   `json:"waktu_makan"`
-		Porsi           float64  `json:"porsi"`
-		KaloriKcal      *float64 `json:"kalori_kcal"`
-		ProteinG        *float64 `json:"protein_g"`
-		KarbohidratG    *float64 `json:"karbohidrat_g"`
-		LemakG          *float64 `json:"lemak_g"`
-		SeratG          *float64 `json:"serat_g"`
-		Sumber          string   `json:"sumber"`
-		ResepID         *int64   `json:"resep_id"`
+		isianTambahMakan
+		ChildID string `json:"child_id"`
 	}
 	if err := bacaJSON(r, &isian); err != nil {
 		kirimPesan(w, http.StatusBadRequest, "Body JSON tidak valid")
 		return
 	}
 
-	isian.NamaMakanan = strings.TrimSpace(isian.NamaMakanan)
-	if isian.NamaMakanan == "" || len([]rune(isian.NamaMakanan)) > 120 {
-		kirimPesan(w, http.StatusBadRequest, "Nama makanan wajib diisi (maks 120 karakter).")
-		return
-	}
-	tgl, ok := validasiTanggal(isian.TanggalKonsumsi)
-	if !ok {
-		kirimPesan(w, http.StatusBadRequest, "Format tanggal tidak valid.")
-		return
-	}
-	if tanggalMasaDepan(tgl) {
-		kirimPesan(w, http.StatusBadRequest, "Tanggal tidak boleh di masa depan.")
-		return
-	}
-	if !validasiWaktuMakan(isian.WaktuMakan) {
-		kirimPesan(w, http.StatusBadRequest, "Waktu makan harus Sarapan, Makan siang, Makan malam, atau Selingan.")
-		return
-	}
-	if isian.Porsi <= 0 {
-		kirimPesan(w, http.StatusBadRequest, "Porsi harus lebih dari nol.")
-		return
-	}
-	if (isian.KaloriKcal != nil && *isian.KaloriKcal < 0) ||
-		(isian.ProteinG != nil && *isian.ProteinG < 0) ||
-		(isian.KarbohidratG != nil && *isian.KarbohidratG < 0) ||
-		(isian.LemakG != nil && *isian.LemakG < 0) ||
-		(isian.SeratG != nil && *isian.SeratG < 0) {
-		kirimPesan(w, http.StatusBadRequest, "Nilai gizi tidak boleh negatif.")
+	tgl, pesan := validasiEntriMakan(&isian.isianMakan)
+	if pesan != "" {
+		kirimPesan(w, http.StatusBadRequest, pesan)
 		return
 	}
 
@@ -205,76 +227,37 @@ func apiTambahFoodLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	kirimJSON(w, http.StatusCreated, map[string]any{
-		"success": true,
-		"message": "Catatan berhasil disimpan",
-		"data": foodLogJSON{
-			ID:              id,
-			ChildID:         isian.ChildID,
-			NamaMakanan:     isian.NamaMakanan,
-			TanggalKonsumsi: isian.TanggalKonsumsi,
-			WaktuMakan:      isian.WaktuMakan,
-			Porsi:           isian.Porsi,
-			KaloriKcal:      isian.KaloriKcal,
-			ProteinG:        isian.ProteinG,
-			KarbohidratG:    isian.KarbohidratG,
-			LemakG:          isian.LemakG,
-			SeratG:          isian.SeratG,
-			Sumber:          isian.Sumber,
-			ResepID:         isian.ResepID,
-			CreatedAt:       createdAt.Format(time.RFC3339),
-			UpdatedAt:       updatedAt.Format(time.RFC3339),
-		},
+	kirimDataPesan(w, http.StatusCreated, "Catatan berhasil disimpan", foodLogJSON{
+		ID:              id,
+		ChildID:         isian.ChildID,
+		NamaMakanan:     isian.NamaMakanan,
+		TanggalKonsumsi: isian.TanggalKonsumsi,
+		WaktuMakan:      isian.WaktuMakan,
+		Porsi:           isian.Porsi,
+		KaloriKcal:      isian.KaloriKcal,
+		ProteinG:        isian.ProteinG,
+		KarbohidratG:    isian.KarbohidratG,
+		LemakG:          isian.LemakG,
+		SeratG:          isian.SeratG,
+		Sumber:          isian.Sumber,
+		ResepID:         isian.ResepID,
+		CreatedAt:       createdAt.Format(time.RFC3339),
+		UpdatedAt:       updatedAt.Format(time.RFC3339),
 	})
 }
 
 func apiUbahFoodLog(w http.ResponseWriter, r *http.Request) {
 	u, _ := penggunaKonteks(r.Context())
 	id := r.PathValue("id")
-	var isian struct {
-		NamaMakanan     string   `json:"nama_makanan"`
-		TanggalKonsumsi string   `json:"tanggal_konsumsi"`
-		WaktuMakan      string   `json:"waktu_makan"`
-		Porsi           float64  `json:"porsi"`
-		KaloriKcal      *float64 `json:"kalori_kcal"`
-		ProteinG        *float64 `json:"protein_g"`
-		KarbohidratG    *float64 `json:"karbohidrat_g"`
-		LemakG          *float64 `json:"lemak_g"`
-		SeratG          *float64 `json:"serat_g"`
-	}
+	var isian isianMakan
 	if err := bacaJSON(r, &isian); err != nil {
 		kirimPesan(w, http.StatusBadRequest, "Body JSON tidak valid")
 		return
 	}
 
-	isian.NamaMakanan = strings.TrimSpace(isian.NamaMakanan)
-	if isian.NamaMakanan == "" || len([]rune(isian.NamaMakanan)) > 120 {
-		kirimPesan(w, http.StatusBadRequest, "Nama makanan wajib diisi (maks 120 karakter).")
-		return
-	}
-	tgl, ok := validasiTanggal(isian.TanggalKonsumsi)
-	if !ok {
-		kirimPesan(w, http.StatusBadRequest, "Format tanggal tidak valid.")
-		return
-	}
-	if tanggalMasaDepan(tgl) {
-		kirimPesan(w, http.StatusBadRequest, "Tanggal tidak boleh di masa depan.")
-		return
-	}
-	if !validasiWaktuMakan(isian.WaktuMakan) {
-		kirimPesan(w, http.StatusBadRequest, "Waktu makan tidak valid.")
-		return
-	}
-	if isian.Porsi <= 0 {
-		kirimPesan(w, http.StatusBadRequest, "Porsi harus lebih dari nol.")
-		return
-	}
-	if (isian.KaloriKcal != nil && *isian.KaloriKcal < 0) ||
-		(isian.ProteinG != nil && *isian.ProteinG < 0) ||
-		(isian.KarbohidratG != nil && *isian.KarbohidratG < 0) ||
-		(isian.LemakG != nil && *isian.LemakG < 0) ||
-		(isian.SeratG != nil && *isian.SeratG < 0) {
-		kirimPesan(w, http.StatusBadRequest, "Nilai gizi tidak boleh negatif.")
+	tgl, pesan := validasiEntriMakan(&isian)
+	if pesan != "" {
+		kirimPesan(w, http.StatusBadRequest, pesan)
 		return
 	}
 
@@ -316,26 +299,22 @@ func apiUbahFoodLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	kirimJSON(w, http.StatusOK, map[string]any{
-		"success": true,
-		"message": "Catatan berhasil diubah",
-		"data": foodLogJSON{
-			ID:              id,
-			ChildID:         childID,
-			NamaMakanan:     isian.NamaMakanan,
-			TanggalKonsumsi: isian.TanggalKonsumsi,
-			WaktuMakan:      isian.WaktuMakan,
-			Porsi:           isian.Porsi,
-			KaloriKcal:      isian.KaloriKcal,
-			ProteinG:        isian.ProteinG,
-			KarbohidratG:    isian.KarbohidratG,
-			LemakG:          isian.LemakG,
-			SeratG:          isian.SeratG,
-			Sumber:          sumber,
-			ResepID:         resepID,
-			CreatedAt:       createdAt.Format(time.RFC3339),
-			UpdatedAt:       updatedAt.Format(time.RFC3339),
-		},
+	kirimDataPesan(w, http.StatusOK, "Catatan berhasil diubah", foodLogJSON{
+		ID:              id,
+		ChildID:         childID,
+		NamaMakanan:     isian.NamaMakanan,
+		TanggalKonsumsi: isian.TanggalKonsumsi,
+		WaktuMakan:      isian.WaktuMakan,
+		Porsi:           isian.Porsi,
+		KaloriKcal:      isian.KaloriKcal,
+		ProteinG:        isian.ProteinG,
+		KarbohidratG:    isian.KarbohidratG,
+		LemakG:          isian.LemakG,
+		SeratG:          isian.SeratG,
+		Sumber:          sumber,
+		ResepID:         resepID,
+		CreatedAt:       createdAt.Format(time.RFC3339),
+		UpdatedAt:       updatedAt.Format(time.RFC3339),
 	})
 }
 
@@ -361,10 +340,7 @@ func apiHapusFoodLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	kirimJSON(w, http.StatusOK, map[string]any{
-		"success": true,
-		"message": "Catatan berhasil dihapus",
-	})
+	kirimPesanSukses(w, http.StatusOK, "Catatan berhasil dihapus")
 }
 
 func apiDaftarMaternalFoodLogs(w http.ResponseWriter, r *http.Request) {
@@ -377,16 +353,8 @@ func apiDaftarMaternalFoodLogs(w http.ResponseWriter, r *http.Request) {
 		kirimPesan(w, http.StatusBadRequest, "pregnancy_id wajib")
 		return
 	}
-	if startDate == "" || endDate == "" {
-		kirimPesan(w, http.StatusBadRequest, "start_date dan end_date wajib")
-		return
-	}
-	if _, ok := validasiTanggal(startDate); !ok {
-		kirimPesan(w, http.StatusBadRequest, "Format tanggal tidak valid (YYYY-MM-DD)")
-		return
-	}
-	if _, ok := validasiTanggal(endDate); !ok {
-		kirimPesan(w, http.StatusBadRequest, "Format tanggal tidak valid (YYYY-MM-DD)")
+	if pesan := validasiRentangTanggal(startDate, endDate); pesan != "" {
+		kirimPesan(w, http.StatusBadRequest, pesan)
 		return
 	}
 
@@ -436,52 +404,17 @@ func apiDaftarMaternalFoodLogs(w http.ResponseWriter, r *http.Request) {
 func apiTambahMaternalFoodLog(w http.ResponseWriter, r *http.Request) {
 	u, _ := penggunaKonteks(r.Context())
 	var isian struct {
-		PregnancyID     string   `json:"pregnancy_id"`
-		NamaMakanan     string   `json:"nama_makanan"`
-		TanggalKonsumsi string   `json:"tanggal_konsumsi"`
-		WaktuMakan      string   `json:"waktu_makan"`
-		Porsi           float64  `json:"porsi"`
-		KaloriKcal      *float64 `json:"kalori_kcal"`
-		ProteinG        *float64 `json:"protein_g"`
-		KarbohidratG    *float64 `json:"karbohidrat_g"`
-		LemakG          *float64 `json:"lemak_g"`
-		SeratG          *float64 `json:"serat_g"`
-		Sumber          string   `json:"sumber"`
-		ResepID         *int64   `json:"resep_id"`
+		isianTambahMakan
+		PregnancyID string `json:"pregnancy_id"`
 	}
 	if err := bacaJSON(r, &isian); err != nil {
 		kirimPesan(w, http.StatusBadRequest, "Body JSON tidak valid")
 		return
 	}
 
-	isian.NamaMakanan = strings.TrimSpace(isian.NamaMakanan)
-	if isian.NamaMakanan == "" || len([]rune(isian.NamaMakanan)) > 120 {
-		kirimPesan(w, http.StatusBadRequest, "Nama makanan wajib diisi (maks 120 karakter).")
-		return
-	}
-	tgl, ok := validasiTanggal(isian.TanggalKonsumsi)
-	if !ok {
-		kirimPesan(w, http.StatusBadRequest, "Format tanggal tidak valid.")
-		return
-	}
-	if tanggalMasaDepan(tgl) {
-		kirimPesan(w, http.StatusBadRequest, "Tanggal tidak boleh di masa depan.")
-		return
-	}
-	if !validasiWaktuMakan(isian.WaktuMakan) {
-		kirimPesan(w, http.StatusBadRequest, "Waktu makan harus Sarapan, Makan siang, Makan malam, atau Selingan.")
-		return
-	}
-	if isian.Porsi <= 0 {
-		kirimPesan(w, http.StatusBadRequest, "Porsi harus lebih dari nol.")
-		return
-	}
-	if (isian.KaloriKcal != nil && *isian.KaloriKcal < 0) ||
-		(isian.ProteinG != nil && *isian.ProteinG < 0) ||
-		(isian.KarbohidratG != nil && *isian.KarbohidratG < 0) ||
-		(isian.LemakG != nil && *isian.LemakG < 0) ||
-		(isian.SeratG != nil && *isian.SeratG < 0) {
-		kirimPesan(w, http.StatusBadRequest, "Nilai gizi tidak boleh negatif.")
+	tgl, pesan := validasiEntriMakan(&isian.isianMakan)
+	if pesan != "" {
+		kirimPesan(w, http.StatusBadRequest, pesan)
 		return
 	}
 
@@ -521,76 +454,37 @@ func apiTambahMaternalFoodLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	kirimJSON(w, http.StatusCreated, map[string]any{
-		"success": true,
-		"message": "Catatan berhasil disimpan",
-		"data": maternalFoodLogJSON{
-			ID:              id,
-			PregnancyID:     isian.PregnancyID,
-			NamaMakanan:     isian.NamaMakanan,
-			TanggalKonsumsi: isian.TanggalKonsumsi,
-			WaktuMakan:      isian.WaktuMakan,
-			Porsi:           isian.Porsi,
-			KaloriKcal:      isian.KaloriKcal,
-			ProteinG:        isian.ProteinG,
-			KarbohidratG:    isian.KarbohidratG,
-			LemakG:          isian.LemakG,
-			SeratG:          isian.SeratG,
-			Sumber:          isian.Sumber,
-			ResepID:         isian.ResepID,
-			CreatedAt:       createdAt.Format(time.RFC3339),
-			UpdatedAt:       updatedAt.Format(time.RFC3339),
-		},
+	kirimDataPesan(w, http.StatusCreated, "Catatan berhasil disimpan", maternalFoodLogJSON{
+		ID:              id,
+		PregnancyID:     isian.PregnancyID,
+		NamaMakanan:     isian.NamaMakanan,
+		TanggalKonsumsi: isian.TanggalKonsumsi,
+		WaktuMakan:      isian.WaktuMakan,
+		Porsi:           isian.Porsi,
+		KaloriKcal:      isian.KaloriKcal,
+		ProteinG:        isian.ProteinG,
+		KarbohidratG:    isian.KarbohidratG,
+		LemakG:          isian.LemakG,
+		SeratG:          isian.SeratG,
+		Sumber:          isian.Sumber,
+		ResepID:         isian.ResepID,
+		CreatedAt:       createdAt.Format(time.RFC3339),
+		UpdatedAt:       updatedAt.Format(time.RFC3339),
 	})
 }
 
 func apiUbahMaternalFoodLog(w http.ResponseWriter, r *http.Request) {
 	u, _ := penggunaKonteks(r.Context())
 	id := r.PathValue("id")
-	var isian struct {
-		NamaMakanan     string   `json:"nama_makanan"`
-		TanggalKonsumsi string   `json:"tanggal_konsumsi"`
-		WaktuMakan      string   `json:"waktu_makan"`
-		Porsi           float64  `json:"porsi"`
-		KaloriKcal      *float64 `json:"kalori_kcal"`
-		ProteinG        *float64 `json:"protein_g"`
-		KarbohidratG    *float64 `json:"karbohidrat_g"`
-		LemakG          *float64 `json:"lemak_g"`
-		SeratG          *float64 `json:"serat_g"`
-	}
+	var isian isianMakan
 	if err := bacaJSON(r, &isian); err != nil {
 		kirimPesan(w, http.StatusBadRequest, "Body JSON tidak valid")
 		return
 	}
 
-	isian.NamaMakanan = strings.TrimSpace(isian.NamaMakanan)
-	if isian.NamaMakanan == "" || len([]rune(isian.NamaMakanan)) > 120 {
-		kirimPesan(w, http.StatusBadRequest, "Nama makanan wajib diisi (maks 120 karakter).")
-		return
-	}
-	tgl, ok := validasiTanggal(isian.TanggalKonsumsi)
-	if !ok {
-		kirimPesan(w, http.StatusBadRequest, "Format tanggal tidak valid.")
-		return
-	}
-	if tanggalMasaDepan(tgl) {
-		kirimPesan(w, http.StatusBadRequest, "Tanggal tidak boleh di masa depan.")
-		return
-	}
-	if !validasiWaktuMakan(isian.WaktuMakan) {
-		kirimPesan(w, http.StatusBadRequest, "Waktu makan tidak valid.")
-		return
-	}
-	if isian.Porsi <= 0 {
-		kirimPesan(w, http.StatusBadRequest, "Porsi harus lebih dari nol.")
-		return
-	}
-	if (isian.KaloriKcal != nil && *isian.KaloriKcal < 0) ||
-		(isian.ProteinG != nil && *isian.ProteinG < 0) ||
-		(isian.KarbohidratG != nil && *isian.KarbohidratG < 0) ||
-		(isian.LemakG != nil && *isian.LemakG < 0) ||
-		(isian.SeratG != nil && *isian.SeratG < 0) {
-		kirimPesan(w, http.StatusBadRequest, "Nilai gizi tidak boleh negatif.")
+	tgl, pesan := validasiEntriMakan(&isian)
+	if pesan != "" {
+		kirimPesan(w, http.StatusBadRequest, pesan)
 		return
 	}
 
@@ -633,26 +527,22 @@ func apiUbahMaternalFoodLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	kirimJSON(w, http.StatusOK, map[string]any{
-		"success": true,
-		"message": "Catatan berhasil diubah",
-		"data": maternalFoodLogJSON{
-			ID:              id,
-			PregnancyID:     pregnancyID,
-			NamaMakanan:     isian.NamaMakanan,
-			TanggalKonsumsi: isian.TanggalKonsumsi,
-			WaktuMakan:      isian.WaktuMakan,
-			Porsi:           isian.Porsi,
-			KaloriKcal:      isian.KaloriKcal,
-			ProteinG:        isian.ProteinG,
-			KarbohidratG:    isian.KarbohidratG,
-			LemakG:          isian.LemakG,
-			SeratG:          isian.SeratG,
-			Sumber:          sumber,
-			ResepID:         resepID,
-			CreatedAt:       createdAt.Format(time.RFC3339),
-			UpdatedAt:       updatedAt.Format(time.RFC3339),
-		},
+	kirimDataPesan(w, http.StatusOK, "Catatan berhasil diubah", maternalFoodLogJSON{
+		ID:              id,
+		PregnancyID:     pregnancyID,
+		NamaMakanan:     isian.NamaMakanan,
+		TanggalKonsumsi: isian.TanggalKonsumsi,
+		WaktuMakan:      isian.WaktuMakan,
+		Porsi:           isian.Porsi,
+		KaloriKcal:      isian.KaloriKcal,
+		ProteinG:        isian.ProteinG,
+		KarbohidratG:    isian.KarbohidratG,
+		LemakG:          isian.LemakG,
+		SeratG:          isian.SeratG,
+		Sumber:          sumber,
+		ResepID:         resepID,
+		CreatedAt:       createdAt.Format(time.RFC3339),
+		UpdatedAt:       updatedAt.Format(time.RFC3339),
 	})
 }
 
@@ -679,8 +569,5 @@ func apiHapusMaternalFoodLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	kirimJSON(w, http.StatusOK, map[string]any{
-		"success": true,
-		"message": "Catatan berhasil dihapus",
-	})
+	kirimPesanSukses(w, http.StatusOK, "Catatan berhasil dihapus")
 }

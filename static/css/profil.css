@@ -1,0 +1,126 @@
+/* =========================
+   HALAMAN PROFIL
+   (dipakai bersama dashboard.css)
+========================= */
+
+.brand-link {
+    text-decoration: none;
+}
+
+.page-title {
+    font-size: 30px;
+    margin-bottom: 24px;
+}
+
+.profile-card {
+    background: white;
+    border: 1px solid #e3ebe5;
+    border-radius: 18px;
+    padding: 32px;
+    max-width: 640px;
+}
+
+.profile-top {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #edf1ee;
+    margin-bottom: 8px;
+}
+
+.avatar-big {
+    width: 76px;
+    height: 76px;
+    font-size: 30px;
+}
+
+.profile-top h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+    color: #1b4931;
+}
+
+.role-badge {
+    display: inline-block;
+    background: #e5f2e4;
+    color: #25703e;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+.profile-info {
+    margin-bottom: 28px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #edf1ee;
+    font-size: 14px;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row span {
+    color: #7b8981;
+}
+
+.info-row strong {
+    color: #315441;
+}
+
+.status-aktif {
+    color: #237443;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-secondary,
+.btn-logout {
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn-secondary {
+    background: #e5f2e4;
+    color: #25703e;
+}
+
+.btn-secondary:hover {
+    background: #d8ead7;
+}
+
+.btn-logout {
+    background: #fdecea;
+    color: #d32f2f;
+}
+
+.btn-logout:hover {
+    background: #fad9d5;
+}
+
+@media (max-width: 700px) {
+    .profile-card {
+        padding: 22px;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+    }
+}

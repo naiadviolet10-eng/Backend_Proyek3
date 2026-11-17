@@ -44,21 +44,14 @@ func ambilBahanAPI(ctx context.Context, r *http.Request, id int64) (bahanJSON, e
 
 // GET /api/categories
 func apiKategori(w http.ResponseWriter, r *http.Request) {
-	rows, err := db.Query(r.Context(), `SELECT id, name FROM ingredient_categories ORDER BY name`)
+	kategori, err := dbSemuaKategori(r.Context())
 	if err != nil {
 		kirimPesan(w, http.StatusInternalServerError, "Gagal memuat kategori")
 		return
 	}
-	defer rows.Close()
-
-	hasil := []kategoriRingkas{}
-	for rows.Next() {
-		var k kategoriRingkas
-		if err := rows.Scan(&k.ID, &k.Name); err != nil {
-			kirimPesan(w, http.StatusInternalServerError, "Gagal membaca kategori")
-			return
-		}
-		hasil = append(hasil, k)
+	hasil := make([]kategoriRingkas, 0, len(kategori))
+	for _, k := range kategori {
+		hasil = append(hasil, kategoriRingkas{ID: int64(k.ID), Name: k.Nama})
 	}
 	kirimData(w, hasil)
 }
