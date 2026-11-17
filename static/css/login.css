@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
 * {
     margin: 0;
     padding: 0;
@@ -5,9 +7,9 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: #f6f8f7;
-    color: #26352d;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f2f8f7;
+    color: #133835;
 }
 
 /* =========================
@@ -30,7 +32,7 @@ body {
     display: flex;
     align-items: center;
     padding: 60px;
-    background: linear-gradient(145deg, #1f5a37 0%, #3d7a55 60%, #4f946a 100%);
+    background: linear-gradient(145deg, #0a3330 0%, #0f766e 60%, #0d9488 100%);
     color: white;
 }
 
@@ -45,22 +47,25 @@ body {
     padding: 6px 14px;
     margin-bottom: 22px;
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(45, 212, 191, 0.22);
+    color: #ccfbf1;
     font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.4px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .info-content h1 {
     font-size: 42px;
+    font-weight: 800;
     margin-bottom: 16px;
     color: white;
+    line-height: 1.2;
 }
 
 .info-content p {
     font-size: 15px;
     line-height: 1.7;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.88);
     margin-bottom: 32px;
 }
 
@@ -76,6 +81,7 @@ body {
     align-items: center;
     gap: 12px;
     font-size: 14px;
+    font-weight: 600;
 }
 
 .info-list li span {
@@ -85,14 +91,14 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.18);
     font-size: 18px;
 }
 
 .circle {
     position: absolute;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .circle-1 {
@@ -127,22 +133,23 @@ body {
 
 .logo {
     display: block;
-    width: 110px;
+    width: 100px;
     height: auto;
     margin: 0 auto 20px;
 }
 
 .login-card h2 {
     text-align: center;
-    font-size: 26px;
-    color: #315d42;
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f4c47;
 }
 
 .subtitle {
     text-align: center;
     margin: 8px 0 30px;
     font-size: 14px;
-    color: #7b8881;
+    color: #4a6764;
 }
 
 /* =========================
@@ -157,35 +164,35 @@ body {
     display: block;
     margin-bottom: 8px;
     font-size: 13px;
-    font-weight: 600;
-    color: #315d42;
+    font-weight: 700;
+    color: #0f4c47;
 }
 
 .form-group input {
     width: 100%;
     padding: 13px 15px;
-    border: 1px solid #dbe6df;
+    border: 1px solid #d8e8e5;
     border-radius: 10px;
     background: white;
     font-size: 14px;
     font-family: inherit;
-    color: #26352d;
+    color: #133835;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-group input::placeholder {
-    color: #a9b4ae;
+    color: #7c9894;
 }
 
 .form-group input:focus {
     outline: none;
-    border-color: #3d7a55;
-    box-shadow: 0 0 0 4px rgba(61, 122, 85, 0.12);
+    border-color: #0d9488;
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
 }
 
 .form-group input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 100px white inset;
-    -webkit-text-fill-color: #26352d;
+    -webkit-text-fill-color: #133835;
 }
 
 /* =========================
@@ -214,13 +221,14 @@ body {
     border: none;
     border-radius: 8px;
     background: transparent;
-    color: #7b8881;
+    color: #7c9894;
     cursor: pointer;
+    transition: 0.15s;
 }
 
 .toggle-password:hover {
-    background: #eef5f0;
-    color: #315d42;
+    background: #e6f4f2;
+    color: #0f766e;
 }
 
 .toggle-password svg {
@@ -250,17 +258,18 @@ body {
     padding: 14px;
     border: none;
     border-radius: 10px;
-    background: #3d7a55;
+    background: #0f766e;
     color: white;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
     font-family: inherit;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
     transition: background 0.2s, transform 0.1s;
 }
 
 .btn-login:hover {
-    background: #326746;
+    background: #0a3330;
 }
 
 .btn-login:active {
@@ -271,9 +280,10 @@ body {
     margin-bottom: 20px;
     padding: 12px 15px;
     border-radius: 10px;
-    background: #fbe4e4;
-    color: #a63c3c;
+    background: #fee2e2;
+    color: #b91c1c;
     font-size: 13px;
+    font-weight: 600;
     text-align: center;
 }
 
@@ -281,7 +291,7 @@ body {
     margin-top: 28px;
     text-align: center;
     font-size: 12px;
-    color: #9aa6a0;
+    color: #7c9894;
 }
 
 /* =========================
@@ -289,7 +299,6 @@ body {
 ========================= */
 
 @media (max-width: 900px) {
-
     .login-wrapper {
         grid-template-columns: 1fr;
     }

@@ -1,34 +1,34 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 /* =========================
-   PALET HIJAU
+   PALET HIJAU KEBIRUAN (TEAL)
 ========================= */
 :root {
-    --g-950: #1d3314;
-    --g-900: #274a20;
-    --g-800: #30602a;
-    --g-700: #3b7a31;
-    --g-600: #4f9440;
-    --g-500: #6aaa4f;
-    --g-400: #93c46b;
-    --g-300: #bcdc96;
-    --g-200: #dcecb9;
-    --g-100: #edf4d8;
-    --g-50: #f7faea;
+    --g-950: #072321;
+    --g-900: #0a3330;
+    --g-800: #0f4c47;
+    --g-700: #115e59;
+    --g-600: #0d9488;
+    --g-500: #14b8a6;
+    --g-400: #2dd4bf;
+    --g-300: #5eead4;
+    --g-200: #99f6e4;
+    --g-100: #ccfbf1;
+    --g-50: #f0fdfa;
 
-    --lime: #f6d86a;          /* kuning mentega: aksen utama */
-    --lime-soft: #fcf1c6;
-    --teal: #7a9a2e;          /* hijau zaitun (pengganti tosca) */
-    --teal-soft: #e5edc4;
-    --sage: #eef1dc;
+    --lime: #2dd4bf;          /* aksen cerah: cyan-teal */
+    --lime-soft: #ccfbf1;
+    --teal: #0f766e;          /* teal utama */
+    --teal-soft: #e0f7f5;
+    --sage: #e6f4f2;
 
-    --amber: #c9702a;
-    --amber-soft: #fdf0dc;
+    --amber: #d97706;
+    --amber-soft: #fef3c7;
 
-    --text: #2a3f1a;
-    --text-soft: #6b7b55;
-    --text-mute: #9aa57f;
-    --line: #e6ebcf;
+    --text: #133835;
+    --text-soft: #4a6764;
+    --text-mute: #7c9894;
+    --line: #d8e8e5;
 
     --font: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
 }
@@ -42,8 +42,8 @@
 body {
     font-family: var(--font);
     background:
-        radial-gradient(900px 420px at 100% -10%, var(--lime-soft), transparent 70%),
-        #f8f7e8;
+        radial-gradient(900px 420px at 100% -10%, rgba(45, 212, 191, 0.12), transparent 70%),
+        #f2f8f7;
     color: var(--text);
     min-height: 100vh;
 }
@@ -149,8 +149,8 @@ button:focus-visible {
     padding: 36px 40px;
     border-radius: 24px;
     background:
-        radial-gradient(520px 260px at 95% 0%, rgba(147, 196, 107, 0.45), transparent 70%),
-        radial-gradient(380px 220px at 0% 110%, rgba(246, 216, 106, 0.22), transparent 70%),
+        radial-gradient(520px 260px at 95% 0%, rgba(45, 212, 191, 0.35), transparent 70%),
+        radial-gradient(380px 220px at 0% 110%, rgba(20, 184, 166, 0.25), transparent 70%),
         linear-gradient(135deg, var(--g-900), var(--g-700));
     color: white;
 }
@@ -159,7 +159,7 @@ button:focus-visible {
     display: inline-block;
     padding: 5px 12px;
     border-radius: 20px;
-    background: rgba(246, 216, 106, 0.18);
+    background: rgba(45, 212, 191, 0.2);
     color: var(--lime);
     font-size: 11px;
     font-weight: 700;
@@ -261,28 +261,28 @@ button:focus-visible {
 
 .action-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 14px 28px rgba(60, 74, 20, 0.14);
+    box-shadow: 0 14px 28px rgba(15, 118, 110, 0.12);
 }
 
-/* tiga tingkat hijau: zamrud, hijau daun, hijau tosca */
+/* tingkat warna kartu: hijau toska / cyan-teal */
 .green {
-    background: linear-gradient(160deg, #e1efc4, #c5e09a);
-    border-color: var(--g-300);
+    background: linear-gradient(160deg, #e6f7f5, #ccfbf1);
+    border-color: #99f6e4;
 }
 
 .yellow {
-    background: linear-gradient(160deg, #fdf3c8, #f7e08e);
-    border-color: #ecd677;
+    background: linear-gradient(160deg, #e0f2fe, #ccfbf1);
+    border-color: #bae6fd;
 }
 
 .orange {
-    background: linear-gradient(160deg, #eaf1cf, #d3e3a2);
-    border-color: #c6d98f;
+    background: linear-gradient(160deg, #ecfdf5, #d1fae5);
+    border-color: #a7f3d0;
 }
 
 .blue {
-    background: linear-gradient(160deg, #f0efd2, #dfe3a8);
-    border-color: #cfd48c;
+    background: linear-gradient(160deg, #e6fffa, #cbfbee);
+    border-color: #99f6e4;
 }
 
 .icon {
@@ -305,7 +305,7 @@ button:focus-visible {
 }
 
 .action-content p {
-    color: #55663d;
+    color: var(--text-soft);
     font-size: 13px;
     line-height: 1.55;
     min-height: 40px;
@@ -316,7 +316,7 @@ button:focus-visible {
     margin-top: 18px;
     padding: 8px 14px;
     border-radius: 20px;
-    background: var(--g-800);
+    background: var(--g-700);
     color: white;
     font-size: 12px;
     font-weight: 700;
@@ -569,8 +569,8 @@ button:focus-visible {
 footer {
     text-align: center;
     padding: 22px;
-    background: var(--g-900);
-    color: var(--g-300);
+    background: var(--g-950);
+    color: var(--g-200);
     font-size: 12px;
 }
 
