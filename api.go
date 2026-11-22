@@ -26,9 +26,23 @@ func daftarkanAPI() {
 	http.HandleFunc("GET /api/notifications/stock", wajibLoginAPI(apiNotifikasiStok))
 	http.HandleFunc("PUT /api/notifications/{id}/read", wajibLoginAPI(apiTandaiDibaca))
 
+	// Resep Pustaka & Standar
 	http.HandleFunc("GET /api/recipes", wajibLoginAPI(apiDaftarResep))
 	http.HandleFunc("POST /api/recipes/generate", wajibLoginAPI(apiGenerateResep))
 	http.HandleFunc("GET /api/recipes/{id}", wajibLoginAPI(apiDetailResep))
+
+	// Fitur Racik AI
+	http.HandleFunc("GET /api/racik-ai/bahan", wajibLoginAPI(apiRacikBahan))
+	http.HandleFunc("POST /api/racik-ai", wajibLoginAPI(apiRacikAI))
+	http.HandleFunc("POST /api/racik-ai/generate", wajibLoginAPI(apiRacikAI))
+	http.HandleFunc("GET /api/racik-ai/tersimpan", wajibLoginAPI(apiRacikTersimpan))
+	http.HandleFunc("POST /api/racik-ai/simpan", wajibLoginAPI(apiSimpanRacik))
+	http.HandleFunc("DELETE /api/racik-ai/tersimpan/{id}", wajibLoginAPI(apiHapusRacik))
+
+	// Fitur Pertumbuhan
+	http.HandleFunc("POST /api/pertumbuhan/analisis", wajibLoginAPI(apiAnalisisPertumbuhan))
+	http.HandleFunc("GET /api/pertumbuhan/anak/{id}", wajibLoginAPI(apiRiwayatPertumbuhanAnak))
+	http.HandleFunc("POST /api/pertumbuhan", wajibLoginAPI(apiCatatPertumbuhan))
 
 	http.HandleFunc("GET /api/cooking-logs", wajibLoginAPI(apiRiwayatMasak))
 	http.HandleFunc("POST /api/cooking-logs", wajibLoginAPI(apiCatatMasak))

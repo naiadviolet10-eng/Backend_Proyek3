@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -124,7 +125,7 @@ func tanggalValid(s string) bool {
 }
 
 // urlGambar menyusun URL gambar bahan dari path relatif (mis. ingredients/x.jpg).
-// Path absolut http(s) dikembalikan apa adanya.
+// Mendukung environment variable BASE_URL / APP_URL serta deteksi otomatis proxy HTTPS.
 func urlGambar(r *http.Request, imagePath *string) *string {
 	if imagePath == nil || strings.TrimSpace(*imagePath) == "" {
 		return nil
@@ -134,8 +135,19 @@ func urlGambar(r *http.Request, imagePath *string) *string {
 		return &p
 	}
 	nama := path.Base(p)
+
+	// Periksa environment variable BASE_URL atau APP_URL jika dikonfigurasi saat deployment
+	baseURL := strings.TrimRight(os.Getenv("BASE_URL"), "/")
+	if baseURL == "" {
+		baseURL = strings.TrimRight(os.Getenv("APP_URL"), "/")
+	}
+	if baseURL != "" {
+		u := baseURL + "/api/ingredients/image/" + url.PathEscape(nama)
+		return &u
+	}
+
 	skema := "http"
-	if r.TLS != nil {
+	if r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https" {
 		skema = "https"
 	}
 	u := skema + "://" + r.Host + "/api/ingredients/image/" + url.PathEscape(nama)

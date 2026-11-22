@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
 )
@@ -67,8 +68,16 @@ func main() {
 
 	http.HandleFunc("/monitoring", requireLogin(monitoringPage))
 
-	fmt.Println("Server berjalan di http://localhost:8080")
-	if err := http.ListenAndServe(":8080", enableCORS(http.DefaultServeMux)); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	appURL := os.Getenv("APP_URL")
+	if appURL == "" {
+		appURL = "http://localhost:" + port
+	}
+	fmt.Printf("Server berjalan di %s (port %s)\n", appURL, port)
+	if err := http.ListenAndServe(":"+port, enableCORS(http.DefaultServeMux)); err != nil {
 		fmt.Println("Server error:", err)
 	}
 }
