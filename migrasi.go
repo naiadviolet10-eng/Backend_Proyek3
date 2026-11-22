@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // jalankanMigrasi menyiapkan tabel dan kolom yang dipakai API. Setiap
@@ -10,6 +14,17 @@ import (
 func jalankanMigrasi(ctx context.Context) {
 	pernyataan := []string{
 		`CREATE EXTENSION IF NOT EXISTS pgcrypto`,
+
+		`CREATE TABLE IF NOT EXISTS public.admin_users (
+			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			username TEXT UNIQUE NOT NULL,
+			password_hash TEXT NOT NULL,
+			nama TEXT,
+			role TEXT NOT NULL DEFAULT 'admin',
+			created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+			updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_admin_users_username ON public.admin_users (LOWER(username))`,
 
 		`CREATE TABLE IF NOT EXISTS cooking_logs (
 			id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -199,6 +214,25 @@ func jalankanMigrasi(ctx context.Context) {
 	for _, q := range pernyataan {
 		if _, err := db.Exec(ctx, q); err != nil {
 			log.Printf("migrasi gagal: %v", err)
+		}
+	}
+
+	// Migrasi awal akun admin: Jika tabel admin_users kosong dan ada konfigurasi
+	// di .env (ADMIN_USERNAME & ADMIN_PASSWORD), salin sekali ke database.
+	var jumlahAdmin int
+	if err := db.QueryRow(ctx, `SELECT count(*) FROM public.admin_users`).Scan(&jumlahAdmin); err == nil && jumlahAdmin == 0 {
+		u := strings.ToLower(strings.TrimSpace(os.Getenv("ADMIN_USERNAME")))
+		p := os.Getenv("ADMIN_PASSWORD")
+		if u != "" && p != "" {
+			if h, err := bcrypt.GenerateFromPassword([]byte(p), bcrypt.DefaultCost); err == nil {
+				_, errInsert := db.Exec(ctx, `
+					INSERT INTO public.admin_users (username, password_hash, nama, role)
+					VALUES ($1, $2, 'Administrator', 'admin')
+					ON CONFLICT (username) DO NOTHING`, u, string(h))
+				if errInsert == nil {
+					log.Printf("Akun admin awal (%s) berhasil didaftarkan ke tabel admin_users di database", u)
+				}
+			}
 		}
 	}
 }

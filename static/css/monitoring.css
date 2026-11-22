@@ -8,8 +8,8 @@
 
 body {
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f2f8f7;
-    color: #133835;
+    background: #f6faf7;
+    color: #142a20;
 }
 
 /* Main Content */
@@ -26,18 +26,18 @@ body {
     align-items: center;
     margin-bottom: 28px;
     padding-bottom: 20px;
-    border-bottom: 2px solid #0d9488;
+    border-bottom: 2px solid #2a6e52;
 }
 
 .page-title h1 {
     font-size: 26px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
     margin-bottom: 5px;
 }
 
 .page-title p {
-    color: #4a6764;
+    color: #445f52;
     font-size: 14px;
 }
 
@@ -51,8 +51,8 @@ body {
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: #ccfbf1;
-    color: #0f766e;
+    background: #daf2e5;
+    color: #205640;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -69,29 +69,29 @@ body {
 .admin-text strong {
     font-size: 14px;
     font-weight: 700;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .admin-text small {
     font-size: 12px;
-    color: #7c9894;
+    color: #738e82;
 }
 
 .back-button {
     text-decoration: none;
-    color: #0f766e;
+    color: #205640;
     font-size: 14px;
     font-weight: 700;
     margin-left: 14px;
     padding: 8px 14px;
     border-radius: 8px;
-    background: #e6f4f2;
+    background: #edf6f1;
     transition: 0.15s;
 }
 
 .back-button:hover {
-    background: #ccfbf1;
-    color: #0a3330;
+    background: #daf2e5;
+    color: #102d21;
 }
 
 /* Section */
@@ -109,13 +109,13 @@ body {
 .section-title h2 {
     font-size: 18px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
     margin-bottom: 4px;
 }
 
 .section-title p {
     font-size: 13px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 /* Statistik */
@@ -129,8 +129,8 @@ body {
     background: #fff;
     padding: 20px;
     border-radius: 16px;
-    border: 1px solid #d8e8e5;
-    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.04);
+    border: 1px solid #dbe7e0;
+    box-shadow: 0 4px 15px rgba(32, 86, 64, 0.04);
     display: flex;
     align-items: center;
     gap: 15px;
@@ -139,7 +139,7 @@ body {
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(15, 118, 110, 0.08);
+    box-shadow: 0 8px 24px rgba(32, 86, 64, 0.08);
 }
 
 .stat-icon {
@@ -147,7 +147,7 @@ body {
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: #e6f4f2;
+    background: #edf6f1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -157,14 +157,14 @@ body {
     display: block;
     font-size: 12px;
     font-weight: 600;
-    color: #4a6764;
+    color: #445f52;
     margin-bottom: 4px;
 }
 
 .stat-content h3 {
     font-size: 24px;
     font-weight: 800;
-    color: #0d9488;
+    color: #2a6e52;
 }
 
 /* Search */
@@ -177,23 +177,23 @@ body {
 .search-box input {
     width: 240px;
     padding: 10px 14px;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     border-radius: 8px;
     outline: none;
     font-size: 13px;
     font-family: inherit;
-    color: #133835;
+    color: #142a20;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .search-box input:focus {
-    border-color: #0d9488;
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    border-color: #2a6e52;
+    box-shadow: 0 0 0 3px rgba(42, 110, 82, 0.15);
 }
 
 .search-box button {
     border: none;
-    background: #0f766e;
+    background: #205640;
     color: #fff;
     padding: 10px 16px;
     border-radius: 8px;
@@ -205,15 +205,15 @@ body {
 }
 
 .search-box button:hover {
-    background: #0a3330;
+    background: #102d21;
 }
 
 /* Table */
 .table-container {
     background: #fff;
     border-radius: 16px;
-    border: 1px solid #d8e8e5;
-    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.04);
+    border: 1px solid #dbe7e0;
+    box-shadow: 0 4px 15px rgba(32, 86, 64, 0.04);
     overflow-x: auto;
 }
 
@@ -231,8 +231,8 @@ td {
 }
 
 th {
-    background: #e6f4f2;
-    color: #0f4c47;
+    background: #edf6f1;
+    color: #184331;
     font-weight: 700;
     font-size: 13px;
 }
@@ -256,8 +256,8 @@ tr:hover {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #ccfbf1;
-    color: #0f766e;
+    background: #daf2e5;
+    color: #205640;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -274,12 +274,12 @@ tr:hover {
 .user-info strong {
     font-size: 13px;
     font-weight: 700;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .user-info small {
     font-size: 11px;
-    color: #7c9894;
+    color: #738e82;
 }
 
 /* Status */
@@ -289,14 +289,14 @@ tr:hover {
     border-radius: 14px;
     font-size: 11px;
     font-weight: 700;
-    background: #ccfbf1;
-    color: #0f766e;
+    background: #daf2e5;
+    color: #205640;
 }
 
 /* Detail Button */
 .detail-btn {
     border: none;
-    background: #0f766e;
+    background: #205640;
     color: #fff;
     padding: 7px 14px;
     border-radius: 6px;
@@ -308,7 +308,7 @@ tr:hover {
 }
 
 .detail-btn:hover {
-    background: #0a3330;
+    background: #102d21;
 }
 
 /* Bottom Cards */
@@ -322,8 +322,8 @@ tr:hover {
     background: #fff;
     border-radius: 16px;
     padding: 22px;
-    border: 1px solid #d8e8e5;
-    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.04);
+    border: 1px solid #dbe7e0;
+    box-shadow: 0 4px 15px rgba(32, 86, 64, 0.04);
 }
 
 .card-header {
@@ -338,13 +338,13 @@ tr:hover {
 .card-header h2 {
     font-size: 17px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
     margin-bottom: 3px;
 }
 
 .card-header p {
     font-size: 12px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 .card-icon {
@@ -369,7 +369,7 @@ tr:hover {
 }
 
 .data-row strong {
-    color: #0d9488;
+    color: #2a6e52;
     font-weight: 700;
 }
 
@@ -386,14 +386,14 @@ tr:hover {
 }
 
 .progress-label strong {
-    color: #0d9488;
+    color: #2a6e52;
     font-weight: 700;
 }
 
 .progress {
     width: 100%;
     height: 10px;
-    background: #e6f4f2;
+    background: #edf6f1;
     border-radius: 10px;
     overflow: hidden;
 }
@@ -401,13 +401,13 @@ tr:hover {
 .progress-bar {
     height: 100%;
     width: 70%;
-    background: #0d9488;
+    background: #2a6e52;
     border-radius: 10px;
 }
 
 /* Penghematan */
 .saving-value {
-    background: #e6f4f2;
+    background: #edf6f1;
     padding: 16px;
     border-radius: 10px;
     margin-bottom: 14px;
@@ -417,14 +417,14 @@ tr:hover {
     display: block;
     font-size: 12px;
     font-weight: 600;
-    color: #4a6764;
+    color: #445f52;
     margin-bottom: 5px;
 }
 
 .saving-value h3 {
     font-size: 24px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .saving-info {
@@ -435,7 +435,7 @@ tr:hover {
 
 .saving-info > div {
     background: #f7faf9;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     padding: 12px;
     border-radius: 10px;
 }
@@ -443,14 +443,14 @@ tr:hover {
 .saving-info span {
     display: block;
     font-size: 12px;
-    color: #4a6764;
+    color: #445f52;
     margin-bottom: 4px;
 }
 
 .saving-info strong {
     font-size: 14px;
     font-weight: 700;
-    color: #0f4c47;
+    color: #184331;
 }
 
 /* Modal */
@@ -486,7 +486,7 @@ tr:hover {
     border: none;
     background: none;
     font-size: 24px;
-    color: #7c9894;
+    color: #738e82;
     cursor: pointer;
 }
 
@@ -501,8 +501,8 @@ tr:hover {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: #ccfbf1;
-    color: #0f766e;
+    background: #daf2e5;
+    color: #205640;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -512,13 +512,13 @@ tr:hover {
 .modal-header h2 {
     font-size: 18px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
     margin-bottom: 2px;
 }
 
 .modal-header p {
     font-size: 12px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 /* Nutrition */
@@ -530,7 +530,7 @@ tr:hover {
 
 .nutrition-card {
     background: #f7faf9;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     padding: 14px;
     border-radius: 10px;
 }
@@ -538,14 +538,14 @@ tr:hover {
 .nutrition-card span {
     display: block;
     font-size: 12px;
-    color: #4a6764;
+    color: #445f52;
     margin-bottom: 5px;
 }
 
 .nutrition-card strong {
     font-size: 18px;
     font-weight: 800;
-    color: #0d9488;
+    color: #2a6e52;
 }
 
 /* Analysis */
@@ -554,14 +554,14 @@ tr:hover {
     margin-top: 12px;
     padding: 14px;
     border-radius: 10px;
-    background: #e6f4f2;
+    background: #edf6f1;
 }
 
 .analysis-box h3,
 .recommendation-box h3 {
     font-size: 13px;
     font-weight: 700;
-    color: #0f4c47;
+    color: #184331;
     margin-bottom: 5px;
 }
 
@@ -569,7 +569,7 @@ tr:hover {
 .recommendation-box p {
     font-size: 12px;
     line-height: 1.6;
-    color: #133835;
+    color: #142a20;
 }
 
 /* Responsive */

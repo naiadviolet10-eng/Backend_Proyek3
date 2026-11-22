@@ -1,34 +1,44 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
-/* =========================
-   PALET HIJAU KEBIRUAN (TEAL)
-========================= */
+/* =====================================================================
+   PALET WARM GREEN (HIJAU HANGAT) & SENTUHAN AKSEN GOLD/KUNING SUBTIL
+   Sistem Pengelolaan Gizi Dapur Cerdas / NutriPath Backend
+===================================================================== */
 :root {
-    --g-950: #072321;
-    --g-900: #0a3330;
-    --g-800: #0f4c47;
-    --g-700: #115e59;
-    --g-600: #0d9488;
-    --g-500: #14b8a6;
-    --g-400: #2dd4bf;
-    --g-300: #5eead4;
-    --g-200: #99f6e4;
-    --g-100: #ccfbf1;
-    --g-50: #f0fdfa;
+    --g-950: #0a1c15;
+    --g-900: #102d21;
+    --g-800: #184331;
+    --g-700: #205640;
+    --g-600: #2a6e52;
+    --g-500: #358765;
+    --g-400: #54a582;
+    --g-300: #7ec2a3;
+    --g-200: #b1dfc9;
+    --g-100: #daf2e5;
+    --g-50: #f2faf5;
 
-    --lime: #2dd4bf;          /* aksen cerah: cyan-teal */
-    --lime-soft: #ccfbf1;
-    --teal: #0f766e;          /* teal utama */
-    --teal-soft: #e0f7f5;
-    --sage: #e6f4f2;
+    /* Aksen subtil kuning/emas hangat (aksen sekunder ~8%) */
+    --gold: #d97706;
+    --gold-glow: #f59e0b;
+    --gold-soft: #fef3c7;
+    --gold-border: #fde68a;
+    --gold-dark: #b45309;
 
     --amber: #d97706;
     --amber-soft: #fef3c7;
+    --teal: #205640;
+    --teal-soft: #daf2e5;
+    --sage: #e8f4ed;
 
-    --text: #133835;
-    --text-soft: #4a6764;
-    --text-mute: #7c9894;
-    --line: #d8e8e5;
+    --text: #142a20;
+    --text-soft: #445f52;
+    --text-mute: #738e82;
+    --line: #dbe7e0;
+    --line-subtle: #edf4f0;
+
+    --shadow-sm: 0 1px 3px rgba(16, 45, 33, 0.04), 0 1px 2px rgba(16, 45, 33, 0.02);
+    --shadow-md: 0 6px 18px -2px rgba(16, 45, 33, 0.07), 0 2px 6px -1px rgba(16, 45, 33, 0.03);
+    --shadow-lg: 0 16px 32px -4px rgba(16, 45, 33, 0.12), 0 4px 12px -2px rgba(16, 45, 33, 0.05);
 
     --font: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
 }
@@ -42,8 +52,9 @@
 body {
     font-family: var(--font);
     background:
-        radial-gradient(900px 420px at 100% -10%, rgba(45, 212, 191, 0.12), transparent 70%),
-        #f2f8f7;
+        radial-gradient(900px 420px at 100% -10%, rgba(53, 135, 101, 0.10), transparent 70%),
+        radial-gradient(600px 300px at 0% 10%, rgba(245, 158, 11, 0.03), transparent 60%),
+        #f6faf7;
     color: var(--text);
     min-height: 100vh;
 }
@@ -58,13 +69,14 @@ button:focus-visible {
    HEADER
 ========================= */
 .header {
-    height: 75px;
+    height: 76px;
     background: white;
     border-bottom: 3px solid var(--g-600);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 50px;
+    box-shadow: 0 2px 10px rgba(16, 45, 33, 0.03);
 }
 
 .brand {
@@ -82,13 +94,14 @@ button:focus-visible {
 .brand h2 {
     font-size: 20px;
     font-weight: 800;
-    color: var(--g-700);
+    color: var(--g-800);
     letter-spacing: -0.3px;
 }
 
 .brand span {
     font-size: 11px;
     color: var(--text-mute);
+    font-weight: 500;
 }
 
 .admin-profile {
@@ -105,17 +118,24 @@ button:focus-visible {
     height: 40px;
     border-radius: 50%;
     background: var(--g-100);
+    color: var(--g-700);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
     margin-right: 6px;
     cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+}
+
+.notification:hover {
+    background: var(--g-200);
+    transform: scale(1.05);
 }
 
 .avatar {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--g-500), var(--g-800));
     color: white;
@@ -123,6 +143,7 @@ button:focus-visible {
     align-items: center;
     justify-content: center;
     font-weight: 800;
+    box-shadow: 0 2px 8px rgba(32, 86, 64, 0.25);
 }
 
 /* =========================
@@ -136,7 +157,7 @@ button:focus-visible {
 }
 
 /* =========================
-   WELCOME (bagian paling menonjol)
+   WELCOME (Hero Banner Modern)
 ========================= */
 .welcome {
     position: relative;
@@ -146,25 +167,31 @@ button:focus-visible {
     align-items: center;
     gap: 24px;
     margin-bottom: 44px;
-    padding: 36px 40px;
+    padding: 38px 44px;
     border-radius: 24px;
     background:
-        radial-gradient(520px 260px at 95% 0%, rgba(45, 212, 191, 0.35), transparent 70%),
-        radial-gradient(380px 220px at 0% 110%, rgba(20, 184, 166, 0.25), transparent 70%),
-        linear-gradient(135deg, var(--g-900), var(--g-700));
+        radial-gradient(550px 280px at 94% 0%, rgba(245, 158, 11, 0.20), transparent 70%),
+        radial-gradient(420px 240px at 0% 110%, rgba(84, 165, 130, 0.30), transparent 70%),
+        linear-gradient(135deg, var(--g-900) 0%, var(--g-800) 55%, var(--g-700) 100%);
     color: white;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(177, 223, 201, 0.2);
 }
 
 .small-title {
-    display: inline-block;
-    padding: 5px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
     border-radius: 20px;
-    background: rgba(45, 212, 191, 0.2);
-    color: var(--lime);
+    background: rgba(245, 158, 11, 0.16);
+    color: #fef08a;
+    border: 1px solid rgba(245, 158, 11, 0.35);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.2px;
     margin-bottom: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .welcome h1 {
@@ -176,11 +203,12 @@ button:focus-visible {
 }
 
 .welcome h1 span {
-    color: var(--lime);
+    color: #fef08a;
+    text-shadow: 0 2px 12px rgba(245, 158, 11, 0.25);
 }
 
 .description {
-    color: rgba(255, 255, 255, 0.78);
+    color: rgba(255, 255, 255, 0.85);
     font-size: 15px;
     max-width: 560px;
     line-height: 1.7;
@@ -189,28 +217,30 @@ button:focus-visible {
 .date-box {
     flex-shrink: 0;
     background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 16px;
-    padding: 18px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 18px;
+    padding: 20px 26px;
     text-align: right;
+    backdrop-filter: blur(8px);
 }
 
 .date-box span {
     display: block;
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(255, 255, 255, 0.72);
     font-size: 12px;
     margin-bottom: 5px;
+    font-weight: 500;
 }
 
 .date-box strong {
-    font-size: 15px;
+    font-size: 16px;
     color: white;
 }
 
 .date-box small {
     display: block;
     margin-top: 6px;
-    color: var(--lime);
+    color: #fef08a;
     font-size: 13px;
     font-weight: 700;
 }
@@ -230,6 +260,7 @@ button:focus-visible {
     font-size: 21px;
     font-weight: 800;
     letter-spacing: -0.3px;
+    color: var(--g-900);
     margin-bottom: 5px;
 }
 
@@ -244,57 +275,60 @@ button:focus-visible {
 .action-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    gap: 20px;
 }
 
 .action-card {
     text-decoration: none;
-    padding: 24px;
+    padding: 26px;
     border-radius: 20px;
     min-height: 200px;
-    border: 1px solid transparent;
-    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
 .action-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 14px 28px rgba(15, 118, 110, 0.12);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--g-400);
 }
 
-/* tingkat warna kartu: hijau toska / cyan-teal */
+/* Tema Kartu Aksi: Dominan Warm Green dengan Sentuhan Warm Gold */
 .green {
-    background: linear-gradient(160deg, #e6f7f5, #ccfbf1);
-    border-color: #99f6e4;
+    background: linear-gradient(160deg, #f2faf6, #ddf5e9);
+    border-color: #b1dfc9;
 }
 
 .yellow {
-    background: linear-gradient(160deg, #e0f2fe, #ccfbf1);
-    border-color: #bae6fd;
+    background: linear-gradient(160deg, #fdfcf7, #fef7db);
+    border-color: #fde68a;
 }
 
 .orange {
-    background: linear-gradient(160deg, #ecfdf5, #d1fae5);
-    border-color: #a7f3d0;
+    background: linear-gradient(160deg, #f7fbf8, #e5f6ed);
+    border-color: #bfe7d4;
 }
 
 .blue {
-    background: linear-gradient(160deg, #e6fffa, #cbfbee);
-    border-color: #99f6e4;
+    background: linear-gradient(160deg, #f0f9f4, #d4f0e2);
+    border-color: #a3dec1;
 }
 
 .icon {
     width: 54px;
     height: 54px;
     border-radius: 16px;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 26px;
     margin-bottom: 18px;
+    box-shadow: 0 4px 12px rgba(16, 45, 33, 0.05);
 }
 
 .action-content h3 {
@@ -312,18 +346,26 @@ button:focus-visible {
 }
 
 .action-link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     margin-top: 18px;
-    padding: 8px 14px;
+    padding: 8px 16px;
     border-radius: 20px;
     background: var(--g-700);
     color: white;
     font-size: 12px;
     font-weight: 700;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.action-card:hover .action-link {
+    background: var(--g-800);
+    box-shadow: 0 4px 12px rgba(24, 67, 49, 0.25);
 }
 
 /* =========================
-   SUMMARY
+   SUMMARY (Metrik / Statistik)
 ========================= */
 .summary-grid {
     display: grid;
@@ -335,11 +377,18 @@ button:focus-visible {
     background: white;
     border: 1px solid var(--line);
     border-left: 5px solid var(--g-500);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 18px;
+    padding: 22px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 .summary-card:nth-child(2) {
@@ -347,33 +396,42 @@ button:focus-visible {
 }
 
 .summary-card:nth-child(3) {
-    border-left-color: var(--teal);
+    border-left-color: var(--gold);
+}
+
+.summary-card:nth-child(4) {
+    border-left-color: var(--g-600);
 }
 
 .summary-icon {
-    width: 50px;
-    height: 50px;
+    width: 52px;
+    height: 52px;
     border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 22px;
+    flex-shrink: 0;
 }
 
 .green-icon {
     background: var(--g-100);
+    color: var(--g-700);
 }
 
 .yellow-icon {
-    background: var(--lime-soft);
+    background: var(--gold-soft);
+    color: var(--gold-dark);
 }
 
 .orange-icon {
-    background: var(--teal-soft);
+    background: var(--sage);
+    color: var(--g-800);
 }
 
 .red-icon {
-    background: var(--amber-soft);
+    background: var(--gold-soft);
+    color: var(--gold);
 }
 
 .summary-card span {
@@ -390,19 +448,19 @@ button:focus-visible {
     color: var(--g-900);
 }
 
-/* kartu peringatan tetap hangat supaya mudah dibedakan */
+/* Kartu peringatan tetap hangat */
 .summary-card.warning {
-    background: #fff6e8;
-    border-color: #f1d9b3;
-    border-left-color: var(--amber);
+    background: #fffdf8;
+    border-color: var(--gold-border);
+    border-left-color: var(--gold);
 }
 
 .warning strong {
-    color: var(--amber);
+    color: var(--gold-dark);
 }
 
 /* =========================
-   BOTTOM
+   BOTTOM PANELS
 ========================= */
 .bottom-grid {
     display: grid;
@@ -415,7 +473,8 @@ button:focus-visible {
     background: white;
     border: 1px solid var(--line);
     border-radius: 20px;
-    padding: 26px;
+    padding: 28px;
+    box-shadow: var(--shadow-sm);
 }
 
 .panel-header {
@@ -423,12 +482,13 @@ button:focus-visible {
     justify-content: space-between;
     margin-bottom: 18px;
     padding-bottom: 16px;
-    border-bottom: 2px solid var(--g-100);
+    border-bottom: 2px solid var(--g-50);
 }
 
 .panel-header h2 {
     font-size: 18px;
     font-weight: 800;
+    color: var(--g-900);
     margin-bottom: 5px;
 }
 
@@ -442,6 +502,7 @@ button:focus-visible {
     height: 42px;
     border-radius: 12px;
     background: var(--g-100);
+    color: var(--g-700);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -454,9 +515,9 @@ button:focus-visible {
 .activity {
     display: flex;
     align-items: center;
-    gap: 13px;
+    gap: 14px;
     padding: 14px 0;
-    border-bottom: 1px solid var(--g-50);
+    border-bottom: 1px solid var(--line-subtle);
 }
 
 .activity:last-child {
@@ -464,10 +525,11 @@ button:focus-visible {
 }
 
 .activity-icon {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 12px;
-    background: var(--g-100);
+    background: var(--g-50);
+    border: 1px solid var(--g-100);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -496,7 +558,8 @@ button:focus-visible {
     padding: 4px 10px;
     border-radius: 20px;
     background: var(--g-50);
-    color: var(--g-600);
+    color: var(--g-700);
+    border: 1px solid var(--g-100);
     font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
@@ -516,30 +579,30 @@ button:focus-visible {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 18px;
-    border-radius: 14px;
-    background: var(--amber-soft);
-    border: 1px solid #f3e0c2;
-    margin-bottom: 12px;
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: #fffdf7;
+    border: 1px solid var(--gold-border);
+    margin-bottom: 14px;
 }
 
 .moderation-item strong {
     display: block;
     font-size: 13px;
     font-weight: 700;
-    color: #4a3b24;
+    color: #4a3818;
     margin-bottom: 4px;
 }
 
 .moderation-item span {
     font-size: 12px;
-    color: #8f7b5c;
+    color: #8c7348;
 }
 
 .moderation-item b {
     font-size: 24px;
     font-weight: 800;
-    color: var(--amber);
+    color: var(--gold-dark);
 }
 
 .view-button {
@@ -556,11 +619,13 @@ button:focus-visible {
     text-align: center;
     text-decoration: none;
     cursor: pointer;
-    transition: background 0.2s;
+    box-shadow: 0 4px 12px rgba(32, 86, 64, 0.2);
+    transition: all 0.2s;
 }
 
 .view-button:hover {
     background: var(--g-800);
+    box-shadow: 0 6px 16px rgba(24, 67, 49, 0.3);
 }
 
 /* =========================
@@ -568,9 +633,9 @@ button:focus-visible {
 ========================= */
 footer {
     text-align: center;
-    padding: 22px;
+    padding: 24px;
     background: var(--g-950);
-    color: var(--g-200);
+    color: var(--g-300);
     font-size: 12px;
 }
 
@@ -592,6 +657,7 @@ footer {
     color: inherit;
     padding: 4px 12px 4px 4px;
     border-radius: 30px;
+    transition: background 0.15s;
 }
 
 .profile-trigger:hover {
@@ -611,8 +677,8 @@ footer {
     min-width: 190px;
     background: white;
     border: 1px solid var(--line);
-    border-radius: 14px;
-    box-shadow: 0 12px 28px rgba(60, 74, 20, 0.16);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
     padding: 8px;
     z-index: 100;
 }
@@ -625,24 +691,26 @@ footer {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px;
-    border-radius: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
     text-decoration: none;
     color: var(--g-900);
     font-size: 14px;
     font-weight: 500;
+    transition: background 0.15s;
 }
 
 .dropdown-item:hover {
-    background: var(--g-100);
+    background: var(--g-50);
+    color: var(--g-800);
 }
 
 .dropdown-item.logout {
-    color: #c62f2f;
+    color: #dc2626;
 }
 
 .dropdown-item.logout:hover {
-    background: #fdecea;
+    background: #fef2f2;
 }
 
 /* =========================

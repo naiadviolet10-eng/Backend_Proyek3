@@ -12,18 +12,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Kredensial admin dibaca dari environment lewat .env (godotenv/autoload):
-// ADMIN_USERNAME dan ADMIN_PASSWORD. Tidak ada fallback ke nilai hardcoded
-// supaya rahasia tidak pernah masuk ke riwayat versi.
-func kredensialAdmin() (username, password string) {
-	username = strings.ToLower(strings.TrimSpace(os.Getenv("ADMIN_USERNAME")))
-	password = os.Getenv("ADMIN_PASSWORD")
-	if username == "" || password == "" {
-		log.Fatal("ADMIN_USERNAME atau ADMIN_PASSWORD belum di-set di .env")
-	}
-	return username, password
-}
-
 // Kalau SESSION_KEY belum diset di terminal, pakai kunci sementara ini
 // supaya session tetap bisa tersimpan (untuk belajar/testing saja).
 func ambilSessionKey() []byte {
@@ -37,19 +25,7 @@ func ambilSessionKey() []byte {
 
 var store = sessions.NewCookieStore(ambilSessionKey())
 
-// Daftar user: username -> hash bcrypt.
-// Hash dibuat otomatis dari ADMIN_PASSWORD saat program dijalankan.
-var users = map[string]string{}
-
 func init() {
-	username, password := kredensialAdmin()
-
-	h, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
-	}
-	users[username] = string(h)
-
 	store.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   60 * 60 * 3, // login berlaku 3 jam
@@ -75,8 +51,23 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	username := strings.ToLower(strings.TrimSpace(r.FormValue("email")))
 	password := r.FormValue("password")
 
-	hash, ok := users[username]
-	if !ok || bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) != nil {
+	if username == "" || password == "" {
+		tmpl.Execute(w, map[string]string{
+			"Error": "Username dan password wajib diisi",
+			"Email": username,
+		})
+		return
+	}
+
+	// Verifikasi kredensial admin dari database (tabel public.admin_users)
+	var passwordHash string
+	err = db.QueryRow(r.Context(), `
+		SELECT password_hash
+		FROM public.admin_users
+		WHERE LOWER(username) = $1
+	`, username).Scan(&passwordHash)
+
+	if err != nil || bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password)) != nil {
 		log.Printf("login gagal untuk user %q", username)
 		tmpl.Execute(w, map[string]string{
 			"Error": "Username atau password salah",

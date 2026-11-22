@@ -77,7 +77,7 @@ func main() {
 		appURL = "http://localhost:" + port
 	}
 	fmt.Printf("Server berjalan di %s (port %s)\n", appURL, port)
-	if err := http.ListenAndServe(":"+port, enableCORS(http.DefaultServeMux)); err != nil {
+	if err := http.ListenAndServe("0.0.0.0:"+port, enableCORS(http.DefaultServeMux)); err != nil {
 		fmt.Println("Server error:", err)
 	}
 }

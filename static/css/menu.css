@@ -8,8 +8,8 @@
 
 body {
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f2f8f7;
-    color: #133835;
+    background: #f6faf7;
+    color: #142a20;
 }
 
 /* =========================
@@ -22,7 +22,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px solid #0d9488;
+    border-bottom: 2px solid #2a6e52;
 }
 
 .header-left {
@@ -40,25 +40,25 @@ body {
 .header-left h1 {
     font-size: 22px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .header-left p {
     margin-top: 5px;
     font-size: 13px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 .back-button {
     text-decoration: none;
-    color: #0f766e;
+    color: #205640;
     font-size: 14px;
     font-weight: 700;
     transition: color 0.15s;
 }
 
 .back-button:hover {
-    color: #0a3330;
+    color: #102d21;
 }
 
 /* =========================
@@ -81,18 +81,18 @@ body {
 .page-header h2 {
     font-size: 24px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .page-header p {
     margin-top: 7px;
-    color: #4a6764;
+    color: #445f52;
     font-size: 14px;
     line-height: 1.5;
 }
 
 .add-button {
-    background: #0f766e;
+    background: #205640;
     color: white;
     text-decoration: none;
     padding: 12px 22px;
@@ -100,12 +100,12 @@ body {
     font-size: 14px;
     font-weight: 700;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(15, 118, 110, 0.2);
+    box-shadow: 0 2px 8px rgba(32, 86, 64, 0.2);
     transition: background 0.15s;
 }
 
 .add-button:hover {
-    background: #0a3330;
+    background: #102d21;
 }
 
 /* =========================
@@ -120,8 +120,8 @@ body {
 }
 
 .category-card {
-    --warna: #0f766e;
-    --warna-muda: #e6f4f2;
+    --warna: #205640;
+    --warna-muda: #edf6f1;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -132,7 +132,7 @@ body {
     border-top: 2px solid transparent;
     border-right: 2px solid transparent;
     border-bottom: 2px solid transparent;
-    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.04);
+    box-shadow: 0 4px 15px rgba(32, 86, 64, 0.04);
     color: inherit;
     text-decoration: none;
     transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
@@ -140,7 +140,7 @@ body {
 
 .category-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(15, 118, 110, 0.1);
+    box-shadow: 0 8px 24px rgba(32, 86, 64, 0.1);
 }
 
 .category-card:focus-visible {
@@ -155,8 +155,8 @@ body {
     border-bottom-color: var(--warna);
 }
 
-.umum-card     { --warna: #0f766e; --warna-muda: #e6f4f2; }
-.hamil-card    { --warna: #0d9488; --warna-muda: #ccfbf1; }
+.umum-card     { --warna: #205640; --warna-muda: #edf6f1; }
+.hamil-card    { --warna: #2a6e52; --warna-muda: #daf2e5; }
 .menyusui-card { --warna: #0284c7; --warna-muda: #e0f2fe; }
 .balita-card   { --warna: #d97706; --warna-muda: #fef3c7; }
 
@@ -168,7 +168,7 @@ body {
 .category-content span {
     font-size: 12px;
     font-weight: 700;
-    color: #4a6764;
+    color: #445f52;
 }
 
 .category-content h3 {
@@ -181,7 +181,7 @@ body {
 .category-content p {
     font-size: 13px;
     line-height: 1.6;
-    color: #4a6764;
+    color: #445f52;
     margin-bottom: 14px;
     min-height: 3.2em;
 }
@@ -189,7 +189,7 @@ body {
 .category-count {
     font-size: 14px;
     font-weight: 800;
-    color: #133835;
+    color: #142a20;
 }
 
 /* =========================
@@ -210,28 +210,28 @@ body {
 .search-box input {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     border-radius: 10px;
     background: white;
     outline: none;
     font-size: 13px;
     font-family: inherit;
-    color: #133835;
+    color: #142a20;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .search-box input:focus {
-    border-color: #0d9488;
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    border-color: #2a6e52;
+    box-shadow: 0 0 0 3px rgba(42, 110, 82, 0.15);
 }
 
 .reset-filter {
     white-space: nowrap;
     padding: 11px 18px;
     border-radius: 10px;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     background: white;
-    color: #0f766e;
+    color: #205640;
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
@@ -239,7 +239,7 @@ body {
 }
 
 .reset-filter:hover {
-    background: #e6f4f2;
+    background: #edf6f1;
 }
 
 /* =========================
@@ -248,11 +248,11 @@ body {
 
 .form-card {
     background: white;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     border-radius: 16px;
     padding: 26px 28px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.04);
+    box-shadow: 0 4px 15px rgba(32, 86, 64, 0.04);
 }
 
 .menu-head {
@@ -270,17 +270,17 @@ body {
 }
 
 .menu-judul a {
-    color: #0f4c47;
+    color: #184331;
     text-decoration: none;
 }
 
 .menu-judul a:hover {
-    color: #0d9488;
+    color: #2a6e52;
 }
 
 .menu-info {
     font-size: 13px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 .menu-aksi {
@@ -293,7 +293,7 @@ body {
 .label-kecil {
     font-size: 12px;
     font-weight: 700;
-    color: #4a6764;
+    color: #445f52;
     margin-bottom: 8px;
 }
 
@@ -307,8 +307,8 @@ body {
     font-weight: 700;
 }
 
-.tag-umum     { background: #e6f4f2; color: #0f766e; }
-.tag-hamil    { background: #ccfbf1; color: #0f766e; }
+.tag-umum     { background: #edf6f1; color: #205640; }
+.tag-hamil    { background: #daf2e5; color: #205640; }
 .tag-menyusui { background: #e0f2fe; color: #0369a1; }
 .tag-balita   { background: #fef3c7; color: #b45309; }
 
@@ -331,8 +331,8 @@ body {
 .resep-chip {
     padding: 6px 14px;
     border-radius: 20px;
-    background: #e6f4f2;
-    color: #0f766e;
+    background: #edf6f1;
+    color: #205640;
     font-size: 12px;
     font-weight: 700;
     text-decoration: none;
@@ -340,12 +340,12 @@ body {
 }
 
 .resep-chip:hover {
-    background: #ccfbf1;
+    background: #daf2e5;
 }
 
 .resep-belum {
     font-size: 12px;
-    color: #7c9894;
+    color: #738e82;
 }
 
 /* =========================
@@ -395,13 +395,13 @@ body {
 
 .btn-detail,
 .btn-edit {
-    background: #e6f4f2;
-    color: #0f766e;
+    background: #edf6f1;
+    color: #205640;
 }
 
 .btn-detail:hover,
 .btn-edit:hover {
-    background: #ccfbf1;
+    background: #daf2e5;
 }
 
 .btn-hapus {
@@ -430,10 +430,10 @@ button.btn-hapus {
 
 .table-card {
     background: white;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     border-radius: 16px;
     overflow-x: auto;
-    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.04);
+    box-shadow: 0 4px 15px rgba(32, 86, 64, 0.04);
 }
 
 table {
@@ -443,7 +443,7 @@ table {
 }
 
 thead {
-    background: #e6f4f2;
+    background: #edf6f1;
 }
 
 th {
@@ -451,7 +451,7 @@ th {
     text-align: left;
     font-size: 13px;
     font-weight: 700;
-    color: #0f4c47;
+    color: #184331;
     white-space: nowrap;
 }
 
@@ -460,7 +460,7 @@ th small {
     margin-top: 2px;
     font-weight: normal;
     font-size: 11px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 td {
@@ -471,17 +471,17 @@ td {
 }
 
 td.nama a {
-    color: #0f4c47;
+    color: #184331;
     font-weight: 700;
     text-decoration: none;
 }
 
 td.nama a:hover {
-    color: #0d9488;
+    color: #2a6e52;
 }
 
 .muted {
-    color: #7c9894;
+    color: #738e82;
 }
 
 /* Tabel bahan di dalam kartu menu */
@@ -494,24 +494,24 @@ td.nama a:hover {
 }
 
 .tabel-kecil tfoot td {
-    background: #e6f4f2;
-    border-top: 1px solid #d8e8e5;
+    background: #edf6f1;
+    border-top: 1px solid #dbe7e0;
     font-weight: 700;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .tabel-kecil tfoot tr:first-child td {
-    border-top: 2px solid #d8e8e5;
+    border-top: 2px solid #dbe7e0;
 }
 
 .tabel-kecil td.kosong-kecil {
     text-align: center;
-    color: #7c9894;
+    color: #738e82;
     padding: 20px;
 }
 
 .tabel-kecil td.kosong-kecil a {
-    color: #0f766e;
+    color: #205640;
     font-weight: 700;
 }
 
@@ -522,7 +522,7 @@ td.nama a:hover {
 .empty {
     text-align: center;
     padding: 50px 20px;
-    color: #7c9894;
+    color: #738e82;
 }
 
 .empty-icon {
@@ -532,7 +532,7 @@ td.nama a:hover {
 
 .empty strong {
     display: block;
-    color: #0f4c47;
+    color: #184331;
     font-size: 15px;
     font-weight: 700;
     margin-bottom: 6px;
@@ -540,7 +540,7 @@ td.nama a:hover {
 
 .empty p {
     font-size: 13px;
-    color: #7c9894;
+    color: #738e82;
 }
 
 .empty-button {
@@ -555,7 +555,7 @@ td.nama a:hover {
 footer {
     text-align: center;
     padding: 25px 20px;
-    color: #7c9894;
+    color: #738e82;
     font-size: 12px;
 }
 

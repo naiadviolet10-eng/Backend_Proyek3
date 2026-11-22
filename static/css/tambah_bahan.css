@@ -8,8 +8,8 @@
 
 body {
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f2f8f7;
-    color: #133835;
+    background: #f6faf7;
+    color: #142a20;
 }
 
 .header {
@@ -18,7 +18,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px solid #0d9488;
+    border-bottom: 3px solid #2a6e52;
+    box-shadow: 0 2px 10px rgba(16, 45, 33, 0.03);
 }
 
 .header-left {
@@ -28,38 +29,43 @@ body {
 }
 
 .header-left img {
-    width: 55px;
-    height: 55px;
+    width: 52px;
+    height: 52px;
     object-fit: contain;
 }
 
 .header-left h1 {
     font-size: 22px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
+    letter-spacing: -0.3px;
 }
 
 .header-left p {
-    margin-top: 5px;
+    margin-top: 4px;
     font-size: 13px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 .back-button {
     text-decoration: none;
-    color: #0f766e;
+    color: #205640;
     font-size: 14px;
     font-weight: 700;
-    transition: color 0.15s;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: #daf2e5;
+    transition: all 0.2s;
 }
 
 .back-button:hover {
-    color: #0a3330;
+    background: #b1dfc9;
+    color: #102d21;
 }
 
 .container {
     max-width: 1000px;
-    margin: 35px auto;
+    margin: 36px auto;
     padding: 0 40px;
 }
 
@@ -67,24 +73,25 @@ body {
 
 .form-card {
     background: white;
-    border: 1px solid #d8e8e5;
-    border-radius: 16px;
-    padding: 28px 32px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.04);
+    border: 1px solid #dbe7e0;
+    border-radius: 18px;
+    padding: 30px 34px;
+    margin-bottom: 22px;
+    box-shadow: 0 4px 18px rgba(16, 45, 33, 0.04);
 }
 
 .form-card h3 {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 800;
-    color: #0f4c47;
-    margin-bottom: 18px;
+    color: #184331;
+    margin-bottom: 20px;
+    letter-spacing: -0.3px;
 }
 
 .form-card .hint {
     font-size: 12px;
     font-weight: normal;
-    color: #7c9894;
+    color: #738e82;
     margin-left: 6px;
 }
 
@@ -115,27 +122,28 @@ body {
 .field label {
     font-size: 13px;
     font-weight: 700;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .field input[type="text"],
 .field input[type="number"],
 .field select {
-    padding: 11px 13px;
-    border: 1px solid #d8e8e5;
-    border-radius: 9px;
+    padding: 12px 14px;
+    border: 1px solid #dbe7e0;
+    border-radius: 10px;
     font-size: 14px;
     font-family: inherit;
-    color: #133835;
-    background: white;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    color: #142a20;
+    background: #fbfdfc;
+    transition: all 0.2s;
 }
 
 .field input:focus,
 .field select:focus {
     outline: none;
-    border-color: #0d9488;
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    background: white;
+    border-color: #2a6e52;
+    box-shadow: 0 0 0 3px rgba(42, 110, 82, 0.15);
 }
 
 /* ===== Unggah foto ===== */
@@ -154,9 +162,9 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border: 1px dashed #ccdedb;
-    border-radius: 14px;
-    background: #e6f4f2;
+    border: 2px dashed #b1dfc9;
+    border-radius: 16px;
+    background: #f2faf5;
     font-size: 40px;
 }
 
@@ -175,16 +183,16 @@ body {
 .upload-kontrol input[type="file"] {
     font-size: 13px;
     font-family: inherit;
-    color: #4a6764;
+    color: #445f52;
 }
 
 .upload-kontrol input[type="file"]::file-selector-button {
     margin-right: 12px;
-    padding: 9px 16px;
+    padding: 9px 18px;
     border: none;
-    border-radius: 8px;
-    background: #e6f4f2;
-    color: #0f766e;
+    border-radius: 10px;
+    background: #daf2e5;
+    color: #205640;
     font-weight: 700;
     font-family: inherit;
     cursor: pointer;
@@ -192,7 +200,7 @@ body {
 }
 
 .upload-kontrol input[type="file"]::file-selector-button:hover {
-    background: #ccfbf1;
+    background: #b1dfc9;
 }
 
 .check-hapus {
@@ -200,7 +208,7 @@ body {
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: #b91c1c;
+    color: #dc2626;
     cursor: pointer;
 }
 
@@ -210,49 +218,51 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    margin-top: 10px;
+    margin-top: 14px;
 }
 
 .btn-simpan {
-    background: #0f766e;
+    background: linear-gradient(135deg, #205640, #184331);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 9px;
+    padding: 13px 28px;
+    border-radius: 12px;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(15, 118, 110, 0.2);
-    transition: background 0.15s;
+    box-shadow: 0 4px 14px rgba(24, 67, 49, 0.25);
+    transition: all 0.2s;
 }
 
 .btn-simpan:hover {
-    background: #0a3330;
+    background: linear-gradient(135deg, #184331, #102d21);
+    box-shadow: 0 6px 18px rgba(24, 67, 49, 0.35);
 }
 
 .btn-batal {
-    background: #e6f4f2;
-    color: #0f766e;
+    background: #edf4f0;
+    color: #445f52;
     text-decoration: none;
-    padding: 12px 24px;
-    border-radius: 9px;
+    padding: 13px 26px;
+    border-radius: 12px;
     font-size: 14px;
     font-weight: 700;
     transition: 0.15s;
 }
 
 .btn-batal:hover {
-    background: #ccfbf1;
+    background: #daf2e5;
+    color: #205640;
 }
 
-/* Layar sedang: form jadi 2 kolom */
+/* Layar sedang */
 @media (max-width: 900px) {
     .form-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* HP: form jadi 1 kolom */
+/* HP */
 @media (max-width: 700px) {
     .header {
         padding: 18px 20px;

@@ -140,7 +140,7 @@ func dbAktivitas(ctx context.Context) []Aktivitas {
 		rows.Close()
 	}
 
-	// 2) Resep yang masuk dari AI (tidak lewat aplikasi, jadi dibaca dari tabel resep)
+	// 2) Resep dari tabel resep (tambah manual)
 	rr, err := db.Query(ctx, `SELECT nama, created_at FROM resep ORDER BY created_at DESC LIMIT 8`)
 	if err != nil {
 		log.Println("Gagal membaca resep terbaru:", err)
@@ -154,7 +154,7 @@ func dbAktivitas(ctx context.Context) []Aktivitas {
 			semua = append(semua, barisAktivitas{
 				a: Aktivitas{
 					Ikon:       "🍲",
-					Judul:      "Resep baru dari AI",
+					Judul:      "Resep baru ditambahkan",
 					Keterangan: fmt.Sprintf("Resep \"%s\" ditambahkan", nama),
 					Waktu:      waktuLalu(t),
 				},
@@ -162,6 +162,30 @@ func dbAktivitas(ctx context.Context) []Aktivitas {
 			})
 		}
 		rr.Close()
+	}
+
+	// 3) Resep yang disimpan dari hasil AI Racik (tabel resep_tersimpan)
+	rAI, errAI := db.Query(ctx, `SELECT nama_resep, created_at FROM public.resep_tersimpan ORDER BY created_at DESC LIMIT 8`)
+	if errAI != nil {
+		log.Println("Gagal membaca resep tersimpan AI:", errAI)
+	} else {
+		for rAI.Next() {
+			var nama string
+			var t time.Time
+			if err := rAI.Scan(&nama, &t); err != nil {
+				break
+			}
+			semua = append(semua, barisAktivitas{
+				a: Aktivitas{
+					Ikon:       "🤖",
+					Judul:      "Resep AI disimpan",
+					Keterangan: fmt.Sprintf("Resep \"%s\" disimpan dari Racik AI", nama),
+					Waktu:      waktuLalu(t),
+				},
+				t: t,
+			})
+		}
+		rAI.Close()
 	}
 
 	// Gabung dan urutkan dari yang terbaru, ambil 6

@@ -8,8 +8,8 @@
 
 body {
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f2f8f7;
-    color: #133835;
+    background: #f6faf7;
+    color: #142a20;
 }
 
 /* =========================
@@ -22,7 +22,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px solid #0d9488;
+    border-bottom: 2px solid #2a6e52;
 }
 
 .header-left {
@@ -40,25 +40,25 @@ body {
 .header-left h1 {
     font-size: 22px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .header-left p {
     margin-top: 5px;
     font-size: 13px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 .back-button {
     text-decoration: none;
-    color: #0f766e;
+    color: #205640;
     font-size: 14px;
     font-weight: 700;
     transition: color 0.15s;
 }
 
 .back-button:hover {
-    color: #0a3330;
+    color: #102d21;
 }
 
 /* =========================
@@ -89,18 +89,18 @@ body {
 .page-header h2 {
     font-size: 24px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .page-header p {
     margin-top: 7px;
-    color: #4a6764;
+    color: #445f52;
     font-size: 14px;
     line-height: 1.5;
 }
 
 .add-button {
-    background: #0f766e;
+    background: #205640;
     color: white;
     text-decoration: none;
     padding: 12px 22px;
@@ -108,12 +108,12 @@ body {
     font-size: 14px;
     font-weight: 700;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(15, 118, 110, 0.2);
+    box-shadow: 0 2px 8px rgba(32, 86, 64, 0.2);
     transition: background 0.15s;
 }
 
 .add-button:hover {
-    background: #0a3330;
+    background: #102d21;
 }
 
 /* =========================
@@ -133,28 +133,28 @@ body {
 .search-box input {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     border-radius: 10px;
     background: white;
     outline: none;
     font-size: 13px;
     font-family: inherit;
-    color: #133835;
+    color: #142a20;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .search-box input:focus {
-    border-color: #0d9488;
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    border-color: #2a6e52;
+    box-shadow: 0 0 0 3px rgba(42, 110, 82, 0.15);
 }
 
 .filter-section select {
     width: 210px;
     padding: 12px 15px;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     border-radius: 10px;
     background: white;
-    color: #4a6764;
+    color: #445f52;
     outline: none;
     font-size: 13px;
     font-family: inherit;
@@ -162,8 +162,8 @@ body {
 }
 
 .filter-section select:focus {
-    border-color: #0d9488;
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    border-color: #2a6e52;
+    box-shadow: 0 0 0 3px rgba(42, 110, 82, 0.15);
 }
 
 /* =========================
@@ -172,10 +172,10 @@ body {
 
 .table-card {
     background: white;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     border-radius: 16px;
     overflow-x: auto;
-    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.04);
+    box-shadow: 0 4px 15px rgba(32, 86, 64, 0.04);
 }
 
 table {
@@ -185,7 +185,7 @@ table {
 }
 
 thead {
-    background: #e6f4f2;
+    background: #edf6f1;
 }
 
 th {
@@ -193,7 +193,7 @@ th {
     text-align: left;
     font-size: 13px;
     font-weight: 700;
-    color: #0f4c47;
+    color: #184331;
     white-space: nowrap;
 }
 
@@ -202,7 +202,7 @@ th small {
     margin-top: 2px;
     font-weight: normal;
     font-size: 11px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 td {
@@ -213,13 +213,13 @@ td {
 }
 
 td.nama a {
-    color: #0f4c47;
+    color: #184331;
     font-weight: 700;
     text-decoration: none;
 }
 
 td.nama a:hover {
-    color: #0d9488;
+    color: #2a6e52;
 }
 
 /* =========================
@@ -229,7 +229,7 @@ td.nama a:hover {
 .empty {
     text-align: center;
     padding: 70px 20px;
-    color: #7c9894;
+    color: #738e82;
 }
 
 .empty-icon {
@@ -239,7 +239,7 @@ td.nama a:hover {
 
 .empty strong {
     display: block;
-    color: #0f4c47;
+    color: #184331;
     font-size: 15px;
     font-weight: 700;
     margin-bottom: 6px;
@@ -247,7 +247,7 @@ td.nama a:hover {
 
 .empty p {
     font-size: 13px;
-    color: #7c9894;
+    color: #738e82;
 }
 
 /* =========================
@@ -279,13 +279,13 @@ td.nama a:hover {
 
 .btn-detail,
 .btn-edit {
-    background: #e6f4f2;
-    color: #0f766e;
+    background: #edf6f1;
+    color: #205640;
 }
 
 .btn-detail:hover,
 .btn-edit:hover {
-    background: #ccfbf1;
+    background: #daf2e5;
 }
 
 .btn-hapus {
@@ -314,24 +314,24 @@ button.btn-hapus {
 
 .form-card {
     background: white;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     border-radius: 16px;
     padding: 26px 28px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.04);
+    box-shadow: 0 4px 15px rgba(32, 86, 64, 0.04);
 }
 
 .form-card h3 {
     font-size: 17px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
     margin-bottom: 18px;
 }
 
 .form-card .hint {
     font-size: 12px;
     font-weight: normal;
-    color: #7c9894;
+    color: #738e82;
     margin-left: 6px;
 }
 
@@ -353,7 +353,7 @@ button.btn-hapus {
 .field label {
     font-size: 13px;
     font-weight: 700;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .form-card input[type="text"],
@@ -362,11 +362,11 @@ button.btn-hapus {
 .form-card select,
 .form-card textarea {
     padding: 11px 13px;
-    border: 1px solid #d8e8e5;
+    border: 1px solid #dbe7e0;
     border-radius: 9px;
     font-size: 14px;
     font-family: inherit;
-    color: #133835;
+    color: #142a20;
     background: white;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -379,8 +379,8 @@ button.btn-hapus {
 .form-card select:focus,
 .form-card textarea:focus {
     outline: none;
-    border-color: #0d9488;
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    border-color: #2a6e52;
+    box-shadow: 0 0 0 3px rgba(42, 110, 82, 0.15);
 }
 
 /* Baris bahan dinamis */
@@ -408,10 +408,10 @@ button.btn-hapus {
 .btn-tambah-baris {
     margin-top: 6px;
     padding: 10px 16px;
-    border: 1px dashed #0d9488;
+    border: 1px dashed #2a6e52;
     border-radius: 9px;
     background: white;
-    color: #0f766e;
+    color: #205640;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
@@ -419,17 +419,17 @@ button.btn-hapus {
 }
 
 .btn-tambah-baris:hover {
-    background: #e6f4f2;
+    background: #edf6f1;
 }
 
 .hint-bawah {
     margin-top: 14px;
     font-size: 12px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 .hint-bawah a {
-    color: #0f766e;
+    color: #205640;
     font-weight: 700;
 }
 
@@ -442,7 +442,7 @@ button.btn-hapus {
 
 .btn-simpan {
     display: inline-block;
-    background: #0f766e;
+    background: #205640;
     color: white;
     border: none;
     padding: 12px 24px;
@@ -451,17 +451,17 @@ button.btn-hapus {
     font-weight: 700;
     text-decoration: none;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(15, 118, 110, 0.2);
+    box-shadow: 0 2px 8px rgba(32, 86, 64, 0.2);
     transition: background 0.15s;
 }
 
 .btn-simpan:hover {
-    background: #0a3330;
+    background: #102d21;
 }
 
 .btn-batal {
-    background: #e6f4f2;
-    color: #0f766e;
+    background: #edf6f1;
+    color: #205640;
     text-decoration: none;
     padding: 12px 24px;
     border-radius: 9px;
@@ -471,7 +471,7 @@ button.btn-hapus {
 }
 
 .btn-batal:hover {
-    background: #ccfbf1;
+    background: #daf2e5;
 }
 
 /* =========================
@@ -504,7 +504,7 @@ button.btn-hapus {
 }
 
 .gizi-item {
-    background: #e6f4f2;
+    background: #edf6f1;
     border-radius: 12px;
     padding: 16px;
     text-align: center;
@@ -514,18 +514,18 @@ button.btn-hapus {
     display: block;
     font-size: 22px;
     font-weight: 800;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .gizi-item small {
     font-size: 12px;
-    color: #4a6764;
+    color: #445f52;
 }
 
 .catatan {
     margin-top: 16px;
     font-size: 12px;
-    color: #7c9894;
+    color: #738e82;
 }
 
 .tabel-kecil {
@@ -533,10 +533,10 @@ button.btn-hapus {
 }
 
 .tabel-kecil tfoot td {
-    background: #e6f4f2;
-    border-top: 2px solid #d8e8e5;
+    background: #edf6f1;
+    border-top: 2px solid #dbe7e0;
     font-weight: 700;
-    color: #0f4c47;
+    color: #184331;
 }
 
 .langkah {
@@ -552,7 +552,7 @@ button.btn-hapus {
 footer {
     text-align: center;
     padding: 25px 20px;
-    color: #7c9894;
+    color: #738e82;
     font-size: 12px;
 }
 
